@@ -1,0 +1,44 @@
+﻿@model ECommerce.ViewModel.ViewModelLogin
+@{
+    Layout = null;
+}
+
+<link href="~/css/site.css" rel="stylesheet" />
+
+
+<form method="post" asp-action="Login" asp-controller="Account" id="loginForm">
+    <div class="form-group">
+        <label for="exampleInputEmail1">الايميل</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" asp-for="Email" aria-describedby="emailHelp" placeholder="الايميل" required>
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-2">
+        <label for="exampleInputPassword1">الباسورد</label>
+        <input type="password" class="form-control" asp-for="Password" id="exampleInputPassword1" placeholder="الباسورد" required>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group form-check mt-2">
+        <label class="form-check-label" for="exampleCheck1">تذكرني</label>
+        <input type="checkbox" asp-for="RememberMe" class="" id="exampleCheck1">
+    </div>
+    <button type="submit" id="submitButton" disabled class="btn btn-primary mt-5">تسجيل دخول</button>
+    <a class="btn btn-success mt-5" asp-action="Register" asp-controller="Account">تسجيل جديد</a>
+</form>
+
+
+    <div id="errorDiv" class="m-3 text-danger" style="display: none;">
+        <p>البريد الإلكتروني أو كلمة المرور غير صحيحة. الرجاء المحاولة مرة أخرى.</p>
+    </div>
+
+
+
+<div id="loadingSpinner" style="display: none;" hidden>
+    <div class="spinner"></div>
+</div>
+
+<script src="~/js/site.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

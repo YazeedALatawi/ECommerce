@@ -1,0 +1,92 @@
+﻿@model ECommerce.ViewModel.ViewModelProduct
+
+@{
+    ViewData["Title"] = "اضافة منتج";
+}
+
+
+<h1>اضافة منتج</h1>
+
+<h4>المنتجات</h4>
+<hr />
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+
+    <div class="row">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="col-md-5">
+
+                <div class="form-group mb-4">
+                    <label class="control-label">اسم المنتج</label>
+                <span asp-validation-for="Name" class="text-danger"></span>
+                    <input asp-for="Name" class="form-control" />
+                </div>
+                <div class="form-group mb-4">
+                    <label class="control-label">الفئه</label>
+                <span asp-validation-for="categoryId" class="text-danger"></span>
+                    <select asp-for="categoryId" asp-items="@(new SelectList(Model.categoryies,"Id","Name"))" class="form-select">
+                        <option value="none"selected disabled>اختار الفئه</option>
+                    </select>
+                </div>
+                <div class="form-group mb-4">
+                        <label class="control-label">الوصف</label>
+                <span asp-validation-for="Description" class="text-danger"></span>
+                        <textarea asp-for="Description" class="form-control"></textarea>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="control-label">الصناعة</label>
+                <span asp-validation-for="MadeIn" class="text-danger"></span>
+                    <input asp-for="MadeIn" class="form-control" />
+                </div>
+            <div class="form-group">
+                    <label class="control-label">الكمية</label>
+                <span asp-validation-for="Count" class="text-danger"></span>
+                    <input asp-for="Count" dir="ltr" value="" class="form-control" />
+                </div>
+
+        </div>
+        <div class="col-md-5">
+            <div class="form-group mb-4">
+                <label class="control-label">السعر شامل الضريبة</label>
+                <span asp-validation-for="Price" class="text-danger"></span>
+                <input asp-for="Price" dir="ltr" value="" class="form-control" />
+            </div>
+            <div class="form-group mb-4">
+                <label class="control-label">الخصم</label>
+                <span asp-validation-for="Discount" class="text-danger"></span>
+                <input asp-for="Discount" dir="ltr" value="" class="form-control" placeholder="مثال اذا كنت تريد خصم 5% اكتب 5 فقط" />
+            </div>
+            <div class="form-group mb-4">
+                <label class="control-label">الوزن</label>
+                <span asp-validation-for="size" class="text-danger"></span>
+                <input asp-for="size" dir="ltr" value="" class="form-control" />
+            </div>
+            <div class="form-group mb-4">
+                <label class="control-label">الصورة</label>
+                <span asp-validation-for="image" class="text-danger"></span>
+                <input asp-for="image" type="file" class="form-control" accept="image/png, image/gif, image/jpeg" onchange="document.getElementById('img').src = window.URL.createObjectURL(this.files[0])"/>
+            </div>
+            <div class="form-group">
+                <img id="img" alt="" src="" style="width:250px; height:250px;"/>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="اضافة" onclick="confirm('هل انت متاكد؟')" class="btn btn-primary" />
+            </div>
+            <div class="form-group mt-2">
+                <a asp-action="Index">الرجوع</a>
+            </div>
+        </div>
+
+    </div>
+
+</form>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.getElementById("container").classList.remove('me-0');
+        document.getElementById("container").classList.remove('pe-0');
+    </script>
+}

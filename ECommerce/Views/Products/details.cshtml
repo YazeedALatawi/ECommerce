@@ -1,0 +1,57 @@
+﻿@model ECommerce.Models.Product
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+<div class="container custom-container mt-5 mb-5" style="background-color: rgb(248, 245, 242) !important; box-shadow:rgba(21, 24, 25, 0.1) 0px 2px 10px 0px!important;">
+    <div class="card border-0">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- اسم المنتج -->
+                <h4 class="card-title">@Model.Name</h4>
+                <!-- سعر المنتج -->
+                <h5 class="card-text" style="color:rgb(175, 155, 65);">50 ر.س</h5>
+                <!-- صورة المنتج -->
+                <img src="~/@Model.Image" class="card-img-top mt-3 mb-3 border-2 shadow" alt="Product Image">
+                <p class="card-text">الوصف : @Model.Description</p>
+                <p class="card-text">الصناعة : @Model.MadeIn</p>
+
+                <div class="card-body text-right">
+                    <!-- فورم لتحديد الكمية -->
+                    <form>
+                        <label for="quantity">الكمية:</label>
+                        <div class="form-group quantity-btn-container">
+                            <button type="button" class="btn quantity-btn" id="decrementQuantity"><i class="bi bi-dash"></i></button>
+                            <input type="number" class="form-control d-inline-block mx-2 quantity-input text-center px-2" id="quantity" name="quantity" value="1" min="1" readonly>
+                            <!-- زر نقص الكمية -->
+                            <button type="button" class="btn quantity-btn" id="incrementQuantity"><i class="bi bi-plus"></i></button>
+                        </div>
+                        <!-- زر الإرسال -->
+                        <button type="submit" class="btn w-100 mt-4 btnHover" style="background-color:#ffff2d">إضافة إلى السلة <i class="bi bi-cart"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script>
+        document.getElementById("container").classList.remove('me-0');
+        document.getElementById("container").classList.remove('pe-0');
+    </script>
+
+    <script>
+        document.getElementById('incrementQuantity').addEventListener('click', function () {
+            document.getElementById('quantity').stepUp();
+        });
+
+        document.getElementById('decrementQuantity').addEventListener('click', function () {
+            document.getElementById('quantity').stepDown();
+        });
+    </script>
+}

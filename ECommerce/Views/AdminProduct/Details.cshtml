@@ -1,0 +1,100 @@
+﻿@model ECommerce.Models.Product
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div>
+    <h4>التفاصيل</h4>
+    <hr style="height:10px;" />
+    <dl class="row w-100">
+        <div class="col">
+
+            <dt class="col-sm-2">
+                @Html.DisplayName("رقم المنتج")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Id)
+            </dd>
+            <hr />
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayName("ألاسم")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <hr />
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayName("الوصف")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <hr />
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayName("الفئه")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.category.Name)
+            </dd>
+            <hr />
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayName("الصناعة")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.MadeIn)
+            </dd>
+        </div>
+        <div class="col">
+            <dt class="col-sm-2">
+                @Html.DisplayName("الكمية")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Count)
+            </dd>
+            <hr />
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayName("السعر")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+            <hr />
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayName("الخصم")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Discount)
+            </dd>
+            <hr />
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayName("الوزن")
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.size)
+            </dd>
+            <hr />
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayName("الصورة")
+            </dt>
+            <dd class="col-sm-10">
+                <img src="~/@Model.Image" class="mt-3" style="width:300px; height:250px" id="imageToShow" />
+                <br />
+                <button id="showImageInNewTab" class="btn btn-secondary mt-2 text-light">عرض الصورة</button>
+            </dd>
+        </div>
+
+        
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts{
+    <script>
+        document.getElementById("container").classList.remove('me-0');
+        document.getElementById("container").classList.remove('pe-0');
+    </script>
+}

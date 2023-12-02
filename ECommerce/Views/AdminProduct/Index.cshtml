@@ -1,0 +1,162 @@
+﻿@model IEnumerable<ECommerce.Models.Product>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="bg-black col-auto col-md-4 col-lg-3 min-vh-100 d-flex flex-column justify-content-between" style="background-color:black !important;">
+            <div class="bg-black p-2" style="background-color:black !important;">
+                <ul class="nav nav-pills flex-column pt-3 px-0">
+                    <li class="nav-item">
+                        <a asp-action="index" asp-controller="AdminDashboard" class="nav-link text-white">
+                            <i class="fs-5 fa bi-clipboard-data"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">لوحة التحكم</span>
+                        </a>
+                    </li>
+                    <li class="nav-item activeLi">
+                        <a asp-action="index" asp-controller="AdminProduct" class="nav-link text-white">
+                            <i class="fs-5 fa bi-box-seam"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">المنتجات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-action="index" asp-controller="Category" class="nav-link text-white">
+                            <i class="fs-5 fa bi-layers-fill"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">الفئات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-action="index" asp-controller="ShippingCompanies" class="nav-link text-white">
+                            <i class="fs-5 fa bi-airplane-fill"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">شركات الشحن</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white">
+                            <i class="fs-5 fa bi-bag-check"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">الطلبيات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white">
+                            <i class="fs-5 fa bi-person-fill-gear"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">الادراة</span>
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+
+        <!--Content-->
+
+        <div>
+            <h1>المنتجات</h1>
+            <p>
+                <a asp-action="Create" class="btn btn-primary">منتج جديد</a>
+            </p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("الاسم")
+                            </th>
+                            <th>
+                                @Html.DisplayName("الفئة")
+                            </th>
+                            <th>
+                                @Html.DisplayName("الكمية")
+                            </th>
+                            <th>
+                                @Html.DisplayName("الخصم")
+                            </th>
+                            <th>
+                                @Html.DisplayName("السعر")
+                            </th>
+                            <th>
+                                @Html.DisplayName("الصناعة")
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.category.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Count)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Discount)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Price)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.MadeIn)
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@item.Id">تعديل</a> |
+                                        <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">التفاصيل</a> |
+                                        <button class="btn btn-danger" onclick="confirmAlert(event,@item.Id)" >حذف</button>
+                                    </td>
+                                </tr>
+
+                        }
+                    </tbody>
+                </table>
+        </div>
+
+
+
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>
+        function confirmAlert(e, id) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'هل انت متأكد؟',
+                text: "سيتم حذف المنتج اذا تم التاكيد",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'نعم, احذف المنتج'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var idToDelete = id; // استبدل 123 بالقيمة التي تريد حذفها
+
+                    $.ajax({
+                        url: '/Product/Delete',
+                        method: 'POST',
+                        data: { id: idToDelete },
+                        success: function (data) {
+                            // إذا كنت ترغب في معالجة الاستجابة هنا
+                            console.log('تم حذف المنتج');
+                            window.location.href = '/Product/Index'; // قم بتوجيه المستخدم إلى الصفحة المطلوبة بعد الحذف
+                        },
+                        error: function (error) {
+                            // يمكنك التعامل مع الأخطاء هنا
+                            console.error('حدث خطأ أثناء حذف المنتج');
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+
+}
+

@@ -1,0 +1,89 @@
+﻿@model ECommerce.ViewModel.ViewModelRegister
+
+<form style="max-width:750px; margin:100px auto; background-color:aliceblue" class="text-center border border-2 rounded p-5" asp-controller="Account" asp-action="Register" method="post">
+
+    <p class="h4 mb-4">تسجيل جديد</p>
+    <!-- 2 column grid layout with text inputs for the first and last names -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="form-outline">
+                <input type="text" id="form3Example1" class="form-control" asp-for="FirstName" placeholder="الاسم الاول" autocomplete="off"/>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-outline">
+                <input type="text" id="form3Example2" class="form-control" asp-for="LastName" placeholder="الاسم الاخير" autocomplete="off" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email input -->
+    <div class="form-outline mb-4">
+        <input type="email" id="form3Example3" class="form-control" asp-for="Email" placeholder="الايميل" autocomplete="off" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <!-- PhoneNumber input -->
+    <div class="form-outline mb-4">
+        <input id="form3Example3" class="form-control" asp-for="PhoneNumber" placeholder="رقم الهاتف : 056XXXXXXX" autocomplete="off" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <!-- Password input -->
+    <div class="form-outline mb-4">
+        <input type="password" id="form3Example4" class="form-control" asp-for="Password" placeholder="كلمة السر" autocomplete="off">
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+        <!-- Password input -->
+    <div class="form-outline mb-4">
+        <input type="password" id="form3Example4" class="form-control" asp-for="ConfirmPassword" placeholder="اعادة كلمة السر" autocomplete="off" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <!-- Address inputs -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="form-outline">
+                <select class="form-select" asp-for="City" aria-label="Default select example" required>
+                    <option selected disabled>اختار المدينة</option>
+                    @foreach (var city in Model.AvailableCities)
+                    {
+                        <option value="@city">@city</option>
+                    }
+                </select>
+@*                <input type="text" id="form3Example4" class="form-control" asp-for="City" placeholder="المدينة" />
+*@                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-outline">
+                <input type="text" id="form3Example2" class="form-control" asp-for="District" placeholder="الحي" />
+                <span asp-validation-for="District" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-outline">
+                <input type="text" id="form3Example2" class="form-control" asp-for="Street" placeholder="الشارع" />
+                <span asp-validation-for="Street" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Submit button -->
+    <button type="submit" class="btn btn-primary btn-block mb-4 w-75" style="block-size:auto;">تسجيل</button>
+    <div class="mt-2">
+        <p class="text-danger">@TempData["errorRegister"]</p>
+    </div>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById("container").classList.remove('me-0');
+        document.getElementById("container").classList.remove('pe-0');
+    </script>
+}

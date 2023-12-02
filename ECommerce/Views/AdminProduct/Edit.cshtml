@@ -1,0 +1,83 @@
+﻿@model ECommerce.ViewModel.ViewModelEditProduct
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="id" />
+                        <div class="form-group mb-4">
+                <label class="control-label">الاسم</label>
+                <span asp-validation-for="Name" class="text-danger"></span>
+                <input asp-for="Name" class="form-control" />
+            </div>
+            <div class="form-group mb-4">
+                <label class="control-label">الوصف</label>
+                <span asp-validation-for="Description" class="text-danger"></span>
+                <input asp-for="Description" class="form-control" />
+            </div>
+             <div class="form-group mb-4">
+                <label class="control-label">الفئه</label>
+                <span asp-validation-for="categoryId" class="text-danger"></span>
+                <select asp-for="categoryId" asp-items="@(new SelectList(Model.categoryies,"Id","Name"))" class="form-select">
+@*                    <option value="none"selected disabled>اختار الفئه</option>
+*@                </select>
+             </div>
+            <div class="form-group mb-4">
+                <label class="control-label">الصناعة</label>
+                <span asp-validation-for="MadeIn" class="text-danger"></span>
+                <input asp-for="MadeIn" class="form-control" />
+            </div>
+            <div class="form-group mb-4">
+                <label class="control-label">الكمية</label>
+                <span asp-validation-for="Count" class="text-danger"></span>
+                <input asp-for="Count" class="form-control" />
+            </div>
+            <div class="form-groupmb-4">
+                <label class="control-label">السعر</label>
+                <span asp-validation-for="Price" class="text-danger"></span>
+                <input asp-for="Price" class="form-control" />
+            </div>
+            <div class="form-group mb-4">
+                <label class="control-label">الخصم</label>
+                <span asp-validation-for="Discount" class="text-danger"></span>
+                <input asp-for="Discount" class="form-control" />
+            </div>
+            <div class="form-group mb-4">
+                <label class="control-label">الوزن</label>
+                <span asp-validation-for="size" class="text-danger"></span>
+                <input asp-for="size" class="form-control" />
+            </div>
+            <div class="form-group mb-1">
+                <label class="control-label">الصورة</label>
+                <span asp-validation-for="image" class="text-danger"></span>
+                <input asp-for="image" type="file" class="form-control" accept="image/png, image/gif, image/jpeg" onchange="document.getElementById('img').src = window.URL.createObjectURL(this.files[0])" />
+            </div>
+            <div class="form-group">
+                <img id="img" alt="" src="~/@Model.imageUrl" style="width:250px; height:250px;" />
+            </div>
+            <div class="form-group mt-4">
+                <input type="submit" value="حفظ" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">الرجوع</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.getElementById("container").classList.remove('me-0');
+        document.getElementById("container").classList.remove('pe-0');
+    </script>
+}
