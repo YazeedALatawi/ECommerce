@@ -99,37 +99,39 @@
 
 
 
-
                                 @{
-                                    if(item.ProductViewModel.SelectedOptions.Count != 0)
-                                    {
-                                        for (int i = 0, j = 0; i < item.ProductViewModel.ExistingOptions.Count && j < item.ProductViewModel.SelectedOptions.Count; i++, j++)
-                                        {
-                                            if (item.ProductViewModel.ExistingOptions[i] != null)
-                                            {
+                                    var existingOptionsCount = item.ProductViewModel.ExistingOptions.Count;
+                                    var selectedOptionsCount = item.ProductViewModel.SelectedOptions?.Count ?? 0;
 
-                                                <input hidden asp-for="@item.ProductViewModel.SelectedOptions[j].OptionId" value="@item.ProductViewModel.ExistingOptions[i].MainOptionId" />
-                                            
-                                                <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@item.ProductViewModel.SelectedOptions[j].SubOptionId">
-                                                    <option value="" disabled>اختر @item.ProductViewModel.ExistingOptions[i].MainOptionName</option>
-                                                    @foreach (var subOption in item.ProductViewModel.ExistingOptions[i].SubOptions)
-                                                    {
-                                                        <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
-                                                    }
-                                                </select>
-                                            }
-                                        }
-                                    }
-                                    else
+                                    for (int i = 0, j = 0; i < existingOptionsCount; i++)
                                     {
-                                        @for (int i = 0; i < item.ProductViewModel.ExistingOptions.Count; i++)
+                                        var mainOption = item.ProductViewModel.ExistingOptions[i];
+                                        var selectedOption = j < selectedOptionsCount ? item.ProductViewModel.SelectedOptions[j] : null;
+
+                                        if (selectedOption != null && selectedOption.OptionId == mainOption.MainOptionId)
                                         {
+                                            <!-- معالجة العناصر المحددة -->
+                                            <input hidden asp-for="@selectedOption.OptionId" value="@mainOption.MainOptionId" />
+
+                                            <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@selectedOption.SubOptionId">
+                                                <option value="" disabled>اختر @mainOption.MainOptionName</option>
+                                                @foreach (var subOption in mainOption.SubOptions)
+                                                {
+                                                    <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+                                                }
+                                            </select>
+
+                                            j++;
+                                        }
+                                        else
+                                        {
+                                            <!-- معالجة العناصر غير المحددة -->
                                             <div class="form-group">
-                                                <label>@item.ProductViewModel.ExistingOptions[i].MainOptionName</label>
-                                                <input hidden asp-for="@item.ProductViewModel.SelectedOptions[i].OptionId" value="@item.ProductViewModel.ExistingOptions[i].MainOptionId" />
-                                                <select class="form-select" asp-for="@item.ProductViewModel.SelectedOptions[i].SubOptionId">
-                                                    <option value="">اختر @item.ProductViewModel.ExistingOptions[i].MainOptionName</option>
-                                                    @foreach (var subOption in item.ProductViewModel.ExistingOptions[i].SubOptions)
+                                                <label>@mainOption.MainOptionName</label>
+                                                <input hidden asp-for="@mainOption.MainOptionId" value="@mainOption.MainOptionId" />
+                                                <select class="form-select text-center" data-index="@i" id="subOptionSelect_@i" style="padding:3px; width:30%;" asp-for="@mainOption.SubOptions[j].SubOptionId">
+                                                    <option value="" selected>اختر @mainOption.MainOptionName</option>
+                                                    @foreach (var subOption in mainOption.SubOptions)
                                                     {
                                                         <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
                                                     }
@@ -137,8 +139,12 @@
                                             </div>
                                         }
                                     }
-
+                                    
                                 }
+
+
+    
+
 
 
 
@@ -210,14 +216,13 @@
     </div>
 </div>
 
-
+    
 
 @section Scripts{
         <script>
             document.getElementById("container").classList.remove('me-0');
             document.getElementById("container").classList.remove('pe-0');
         </script>
-
 
         
 }
