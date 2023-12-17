@@ -27,7 +27,27 @@
 			return result;
 		}
 
-		public IList<Receipt> List()
+        public IList<Receipt> findAllByCartId(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool findByIdProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Receipt findByIdUser(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Receipt FindString(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Receipt> List()
 		{
 			return db.Receipts.ToList();
 		}

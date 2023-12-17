@@ -1,0 +1,127 @@
+﻿@model IEnumerable<ECommerce.Models.Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="bg-black col-auto col-md-4 col-lg-3 min-vh-100 d-flex flex-column justify-content-between" style="background-color:black !important;">
+            <div class="bg-black p-2" style="background-color:black !important;">
+                <ul class="nav nav-pills flex-column pt-3 px-0">
+                    <li class="nav-item">
+                        <a asp-action="index" asp-controller="AdminDashboard" class="nav-link text-white">
+                            <i class="fs-5 fa bi-clipboard-data"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">لوحة التحكم</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-action="index" asp-controller="AdminProduct" class="nav-link text-white">
+                            <i class="fs-5 fa bi-box-seam"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">المنتجات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-action="index" asp-controller="Category" class="nav-link text-white">
+                            <i class="fs-5 fa bi-layers-fill"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">الفئات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-action="index" asp-controller="ShippingCompanies" class="nav-link text-white">
+                            <i class="fs-5 fa bi-airplane-fill"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">شركات الشحن</span>
+                        </a>
+                    </li>
+                    <li class="nav-item activeLi">
+                        <a asp-action="index" asp-controller="AdminOrder" class="nav-link text-white">
+                            <i class="fs-5 fa bi-bag-check"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">الطلبيات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white">
+                            <i class="fs-5 fa bi-person-fill-gear"></i>
+                            <span class="fs-5 d-none d-sm-inline me-2">الادراة</span>
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+
+        <!--Content-->
+
+
+
+
+
+
+        <div>
+            <h5>الطلبات</h5>
+
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("الرقم")
+                        </th>
+                        <th>
+                            @Html.DisplayName("تاريخ الطلب")
+                        </th>
+                        <th>
+                            @Html.DisplayName("شركة الشحن")
+                        </th>
+                        <th>
+                            @Html.DisplayName("حالة الطلب")
+                        </th>
+                        <th>
+                            @Html.DisplayName("المبلغ الاجمالي")
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Id)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.OrderDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.shipping)
+                            </td>
+                            <td>
+                                    @if(item.orderState != "جديد" && item.orderState != "ملغي")
+                                    {
+                                        <p class="text-success">@item.orderState</p>
+                                    }
+                                    else
+                                    {
+                                        @Html.DisplayFor(modelItem => item.orderState)
+                                    }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.totalPrice)
+                            </td>
+                            <td class="text-center">
+                                <div class="dropdown">
+                                    <a role="button" class="btn btn-light dropdown-toggle" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-toggles"></i></a>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="text-align:center;">
+                                        <button class="dropdown-item btn btn-primary" type="button" onclick="showInPopupCrud('@Url.Action("Details","AdminOrder",new {id=item.Id}, Context.Request.Scheme)','تفاصيل الطلب')">عرض تفاصيل الطلب <i class="bi bi-handbag-fill"></i></button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+
+
+    </div>

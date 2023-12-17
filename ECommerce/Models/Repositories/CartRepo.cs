@@ -24,7 +24,7 @@ namespace ECommerce.Models.Repositories
 
 		public Cart Find(int id)
 		{
-			var result = db.Carts.SingleOrDefault(x => x.Id == id);
+			var result = db.Carts.FirstOrDefault(x => x.Id == id);
 			return result;
 		}
 
@@ -38,5 +38,26 @@ namespace ECommerce.Models.Repositories
 			db.Carts.Update(entity);
 			db.SaveChanges();
 		}
-	}
+
+		public Cart findByIdUser(string id)
+		{
+			var cart = db.Carts.FirstOrDefault(x => x.userId == id && x.isDelete == false);
+			return cart;
+		}
+
+        public IList<Cart> findAllByCartId(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Cart FindString(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool findByIdProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

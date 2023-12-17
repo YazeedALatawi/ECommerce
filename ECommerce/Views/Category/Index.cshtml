@@ -35,7 +35,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-white">
+                        <a asp-action="index" asp-controller="AdminOrder" class="nav-link text-white">
                             <i class="fs-5 fa bi-bag-check"></i>
                             <span class="fs-5 d-none d-sm-inline me-2">الطلبيات</span>
                         </a>
@@ -81,8 +81,14 @@
                                 @Html.DisplayFor(modelItem => item.Name)
                             </td>
                             <td class="text-center">
-                                    <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@item.Id">تعديل</a> |
-                                <button class="btn btn-danger" onclick="confirmAlert(event,@item.Id)">حذف</button>
+                                <div class="dropdown">
+                                    <a role="button" class="btn btn-light dropdown-toggle" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-toggles"></i></a>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="text-align:center;">
+                                        <a class="btn btn-secondary dropdown-item" asp-action="Edit" asp-route-id="@item.Id">تعديل <i class="bi bi-gear-fill"></i></a>
+                                        <button class="btn btn-danger dropdown-item" onclick="confirmAlert(event,@item.Id)">حذف <i class="bi bi-trash-fill"></i></button>
+                                    </div>
+                                </div>
+
                             </td>
                         </tr>
                     }
@@ -115,13 +121,13 @@
                     var idToDelete = id; // استبدل 123 بالقيمة التي تريد حذفها
 
                     $.ajax({
-                        url: '/Category/Delete',
+                        url: '/admin/category/Delete',
                         method: 'POST',
                         data: { id: idToDelete },
                         success: function (data) {
                             // إذا كنت ترغب في معالجة الاستجابة هنا
                             console.log('تم حذف المنتج');
-                            window.location.href = '/Category/Index'; // قم بتوجيه المستخدم إلى الصفحة المطلوبة بعد الحذف
+                            window.location.href = '/admin/category/Index'; // قم بتوجيه المستخدم إلى الصفحة المطلوبة بعد الحذف
                         },
                         error: function (error) {
                             // يمكنك التعامل مع الأخطاء هنا
@@ -133,4 +139,6 @@
         }
     </script>
 
+
 }
+

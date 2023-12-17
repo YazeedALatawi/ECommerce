@@ -1,0 +1,76 @@
+﻿@model IEnumerable<ECommerce.Models.Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+    <style>
+        body{
+            background-color:#555;
+        }
+    </style>
+
+<h3 class="text-white mt-5">الطلبات</h3>
+
+
+<table class="table table-dark mt-5">
+    <thead>
+        <tr>
+            <th scope="col">
+                @Html.DisplayName("رقم الطلب")
+            </th>
+            <th scope="col">
+                @Html.DisplayName("تاريخ الطلب")
+            </th>
+            <th>
+                @Html.DisplayName("شركة الشحن")
+            </th scope="col">
+            <th>
+                @Html.DisplayName("اجمالي السعر")
+            </th>
+            <th scope="col">
+                @Html.DisplayName("حالة الطلب")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td scope="row">
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.shipping)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.totalPrice)
+            </td>
+            <td>
+                    @if(item.orderState != "جديد" && item.orderState != "ملغي")
+                    {
+                        <p class="text-success">@item.orderState</p>
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(modelItem => item.orderState)
+                    }
+
+            </td>
+            <td>
+                <a class="btn btn-secondary" asp-action="Detailsproduct" asp-controller="Order" asp-route-id="@item.Id">المنتجات</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        document.getElementById("container").classList.remove('me-0');
+        document.getElementById("container").classList.remove('pe-0');
+    </script>
+}

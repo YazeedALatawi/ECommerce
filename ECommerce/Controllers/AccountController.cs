@@ -1,4 +1,6 @@
 ﻿using ECommerce.Models;
+using ECommerce.Models.Repositories;
+using ECommerce.Models.Service;
 using ECommerce.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +15,23 @@ namespace ECommerce.Controllers
 		private readonly UserManager<User> userManager;
 		private readonly SignInManager<User> signInManager;
         private readonly IToastNotification _toastNotification;
-		public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IToastNotification toastNotification)
+        private readonly IOperations<User> _userOperation;
+        private readonly IOperations<Product> _products;
+        private readonly IOperations<Cart> _carts;
+        private readonly IOperations<CartProducts> _cartProducts;
+        private readonly ShoppingCartService _shoppingCartService;
+
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IToastNotification toastNotification, ShoppingCartService shoppingCartService, IOperations<Product> products, IOperations<Cart> cart, IOperations<CartProducts> cartProducts, IOperations<User> userOperation)
 		{
 			this.userManager = userManager;
 			this.signInManager = signInManager;
             _toastNotification = toastNotification;
-		}
+            _userOperation = userOperation;
+            _products = products;
+            _carts = cart;
+            _cartProducts = cartProducts;
+            _shoppingCartService = shoppingCartService;
+        }
 
 
         [HttpGet]
@@ -34,7 +47,7 @@ namespace ECommerce.Controllers
             var result = await signInManager.PasswordSignInAsync(user.Email, user.Password, user.RememberMe, false);
 			if (result.Succeeded)
 			{
-                return Json(new { success = true });
+                return Json(new { success = true }); 
             }
             else
 			{
@@ -80,8 +93,61 @@ namespace ECommerce.Controllers
 
                     if (result.Succeeded)
                     {
-                        TempData["RegisterNotfi"] = "تم التسجيل بنجاح";
-                        return RedirectToAction("index", "home");
+
+                        var productsSession = _shoppingCartService.GetShoppingCart();
+                        if (productsSession == null || productsSession.Products.Count == 0)
+                        {
+                            TempData["RegisterNotfi"] = "تم التسجيل بنجاح";
+                            return RedirectToAction("index", "home");
+                        }
+                        else
+                        {
+                            var theCart = _carts.findByIdUser(userManager.GetUserId(User));
+                            if (theCart == null)
+                            {
+                                var newCart = new Cart
+                                {
+                                    userId = userManager.GetUserId(User)
+                                };
+             
+                                _carts.Add(newCart);
+                                var Thecart = _carts.findByIdUser(userManager.GetUserId(User));
+                                foreach (var item in productsSession.Products)
+                                {
+                                    _cartProducts.Add(new CartProducts
+                                    {
+                                        cartId = Thecart.Id,
+                                        productId = item.Id,
+                                        count = item.Quantity,
+                                    });
+
+                                }
+
+                                _shoppingCartService.ClearSession();
+                                TempData["RegisterNotfi"] = "تم التسجيل بنجاح";
+                                return RedirectToAction("index", "home");
+                            }
+                            else
+                            {
+                                var Thecart = _carts.findByIdUser(userManager.GetUserId(User));
+                                foreach (var item in productsSession.Products)
+                                {
+                                    _cartProducts.Add(new CartProducts
+                                    {
+                                        cartId = Thecart.Id,
+                                        productId = item.Id,
+                                        count = item.Quantity,
+                                    });
+
+                                }
+
+                                _shoppingCartService.ClearSession();
+                                TempData["RegisterNotfi"] = "تم التسجيل بنجاح";
+                                return RedirectToAction("index", "home");
+                            }
+                        }
+
+
                     }
                     else
                     {

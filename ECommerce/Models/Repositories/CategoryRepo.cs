@@ -29,7 +29,27 @@ namespace ECommerce.Models.Repositories
 			return result;
 		}
 
-		public IList<Category> List()
+        public IList<Category> findAllByCartId(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool findByIdProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Category findByIdUser(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Category FindString(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Category> List()
 		{ 
 			return db.Categories.ToList();
 		}

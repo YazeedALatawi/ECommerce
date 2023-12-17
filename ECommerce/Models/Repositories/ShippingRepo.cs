@@ -27,7 +27,27 @@
 			return result;
 		}
 
-		public IList<Shipping> List()
+        public IList<Shipping> findAllByCartId(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool findByIdProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Shipping findByIdUser(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Shipping FindString(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Shipping> List()
 		{
 			return db.Shippings.ToList();
 		}

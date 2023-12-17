@@ -14,6 +14,7 @@ namespace ECommerce.Models.Repositories
 		{
 			db.Products.Add(entity);
 			db.SaveChanges();
+
 		}
 
 		public void delete(int id)
@@ -29,7 +30,27 @@ namespace ECommerce.Models.Repositories
 			return result;
 		}
 
-		public IList<Product> List()
+        public IList<Product> findAllByCartId(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool findByIdProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Product findByIdUser(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Product FindString(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Product> List()
 		{
 			return db.Products.Include(x=> x.category).ToList();
 		}

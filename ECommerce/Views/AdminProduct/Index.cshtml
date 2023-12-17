@@ -35,7 +35,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-white">
+                        <a asp-action="index" asp-controller="AdminOrder" class="nav-link text-white">
                             <i class="fs-5 fa bi-bag-check"></i>
                             <span class="fs-5 d-none d-sm-inline me-2">الطلبيات</span>
                         </a>
@@ -58,7 +58,7 @@
             <p>
                 <a asp-action="Create" class="btn btn-primary">منتج جديد</a>
             </p>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-light">
                     <thead>
                         <tr>
                             <th>
@@ -105,9 +105,17 @@
                                         @Html.DisplayFor(modelItem => item.MadeIn)
                                     </td>
                                     <td class="text-center">
-                                        <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@item.Id">تعديل</a> |
-                                        <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">التفاصيل</a> |
-                                        <button class="btn btn-danger" onclick="confirmAlert(event,@item.Id)" >حذف</button>
+
+                                    <div class="dropdown">
+                                        <a role="button" class="btn btn-light dropdown-toggle" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-toggles"></i></a>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="text-align:center;">
+                                        <a class="btn btn-secondary dropdown-item" asp-action="Edit" asp-route-id="@item.Id">تعديل <i class="bi bi-gear-fill"></i></a>
+                                        <a class="btn btn-info dropdown-item" asp-action="Details" asp-route-id="@item.Id">التفاصيل <i class="bi bi-clipboard-minus-fill"></i></a>
+                                        <a class="btn btn-info dropdown-item"  asp-action="Options" asp-controller="AdminProduct" asp-route-id="@item.Id">الخيارات <i class="bi bi-patch-plus-fill"></i></a>
+                                        <button class="btn btn-danger dropdown-item" onclick="confirmAlert(event,@item.Id)">حذف <i class="bi bi-trash-fill"></i></button>
+                                        </div>
+                                    </div>
+
                                     </td>
                                 </tr>
 
@@ -140,13 +148,13 @@
                     var idToDelete = id; // استبدل 123 بالقيمة التي تريد حذفها
 
                     $.ajax({
-                        url: '/Product/Delete',
+                        url: '@Url.Action("Delete", "AdminProduct")',
                         method: 'POST',
                         data: { id: idToDelete },
                         success: function (data) {
                             // إذا كنت ترغب في معالجة الاستجابة هنا
                             console.log('تم حذف المنتج');
-                            window.location.href = '/Product/Index'; // قم بتوجيه المستخدم إلى الصفحة المطلوبة بعد الحذف
+                            window.location.href = '@Url.Action("Index", "AdminProduct")'; // قم بتوجيه المستخدم إلى الصفحة المطلوبة بعد الحذف
                         },
                         error: function (error) {
                             // يمكنك التعامل مع الأخطاء هنا

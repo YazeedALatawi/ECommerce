@@ -1,9 +1,12 @@
-﻿using ECommerce.Models;
+﻿using System.Configuration;
+using System.Text.Encodings.Web;
+using ECommerce.Models;
 using ECommerce.Models.Repositories;
 using ECommerce.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Differencing;
+using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 using static NuGet.Packaging.PackagingConstants;
 
@@ -16,13 +19,17 @@ namespace ECommerce.Controllers
         private readonly IOperations<Category> _category;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
+		private readonly IOperations<productOptions> _productOption;
+        private readonly IOperations<options> _options;
 
-        public AdminProductController(IOperations<Product> products, IOperations<Category> category, IWebHostEnvironment webHostEnvironment, IToastNotification toastNotification)
+        public AdminProductController(IOperations<Product> products, IOperations<Category> category, IWebHostEnvironment webHostEnvironment, IToastNotification toastNotification, IOperations<productOptions> productOption, IOperations<options> options)
         {
             this._products = products;
             this._category = category;
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
+			_productOption = productOption;
+            _options = options;
         }
 
         [HttpGet]
@@ -68,12 +75,18 @@ namespace ECommerce.Controllers
                         MadeIn = product.MadeIn,
                         Price = product.Price,
                         size = product.size,
-                        category = TheCategory,
+                        CategoryId = product.categoryId,
                     };
-                    entity.category.Id = 0;
+
+                    double afterDiscount = 0;
+                    if(entity.Discount > 0 && entity.Discount != null)
+                    {
+                        afterDiscount = entity.Price - (entity.Price * (double)entity.Discount / 100);
+                        entity.Price = afterDiscount;
+                    }
                     _products.Add(entity);
                     toastNotification.AddSuccessToastMessage("تم اضافة المنتج");
-                    return RedirectToAction("index", "Product");
+                    return RedirectToAction("index", "AdminProduct");
 
                 }
 
@@ -96,7 +109,7 @@ namespace ECommerce.Controllers
         {
             _products.delete(id);
             toastNotification.AddSuccessToastMessage("تم الحذف المنتج");
-            return RedirectToAction("index", "Product");
+            return RedirectToAction("index", "AdminProduct");
         }
 
         public IActionResult Edit(int id)
@@ -160,7 +173,168 @@ namespace ECommerce.Controllers
                 
             _products.update(productModel);
 
-            return RedirectToAction("index","Product");
+            return RedirectToAction("index","AdminProduct");
         }
+
+
+        [HttpGet]
+        public IActionResult Options(int id)
+        {
+            var model = _products.Find(id);
+            var productOption = _productOption.List();
+
+            var _model = new ProductViewModel
+            {
+                ProductId = id,
+                ExistingOptions = productOption
+                    .Where(po => po.prdouctId == id)
+                    .Select(po => new MainOptionViewModel
+                    {
+                        MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                        MainOptionName = po.name,
+                        SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                        {
+                            SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                            SubOptionName = o.Name,
+                            SubOptionCount = o.count
+                        }).ToList() ?? new List<SubOptionViewModel>()
+                    }).ToList()
+            };
+
+
+            return View(_model);
+        }
+
+
+        [HttpPost]
+        public IActionResult AddOptions(ProductViewModel viewModel)
+        {
+            var product = _products.Find(viewModel.ProductId);
+
+            if (product != null)
+            {
+                if (product.ProductViewModel == null)
+                {
+                    product.ProductViewModel = new ProductViewModel();
+                }
+
+                product.ProductViewModel.MainOptions = viewModel.MainOptions;
+
+                if (product.ProductViewModel.MainOptions != null)
+                {
+                    foreach (var mainOption in product.ProductViewModel.MainOptions)
+                    {
+                        var productOption = new productOptions
+                        {
+                            name = mainOption.MainOptionName,
+                            prdouctId = viewModel.ProductId,
+                            Options = new List<options>()
+                        };
+
+                        if(mainOption.SubOptions == null)
+                        {
+                            toastNotification.AddErrorToastMessage("الرجاء اضافة اسم الخيار الرئيسي واضافة الخيارات الفرعيه له ثم الحفظ");
+                            return RedirectToAction("Options", new { id = viewModel.ProductId });
+                        }
+
+                        foreach (var subOption in mainOption.SubOptions)
+                        {
+                            productOption.Options.Add(new options
+                            {
+                                Name = subOption.SubOptionName,
+                                count = subOption.SubOptionCount
+                            });
+                        }
+
+                        _productOption.Add(productOption);
+                        toastNotification.AddSuccessToastMessage("تم الاضافة بنجاح");
+                        return RedirectToAction("Options", new {id = viewModel.ProductId});
+
+                    }
+
+                    // يمكنك حفظ التغييرات في قاعدة البيانات هنا
+                }
+            }
+
+            // يمكنك الوصول إلى viewModel وتحديث قاعدة البيانات أو القيام بالمعالجة اللازمة
+            // ثم إعادة توجيه المستخدم أو عرض عرض آخر حسب حاجتك
+            toastNotification.AddErrorToastMessage("الرجاء اضافة اسم الخيار الرئيسي واضافة الخيارات الفرعيه له ثم الحفظ");
+            return RedirectToAction("Options", new { id = viewModel.ProductId });
+        }
+
+
+        [HttpPost]
+        public IActionResult DeleteSubOption(int productId, int mainOptionId, int subOptionId)
+        {
+            // ابحث عن الخيار الرئيسي والفرعي الذي تم حذفه
+            var optionToDelete = _productOption.List()
+                .FirstOrDefault(po => po.prdouctId == productId && po.Id == mainOptionId);
+
+            if (optionToDelete != null)
+            {
+                // ابحث عن الخيار الفرعي داخل الخيار الرئيسي
+                var subOptionToDelete = optionToDelete.Options?.FirstOrDefault(o => o.Id == subOptionId);
+
+                if (subOptionToDelete != null)
+                {
+                    // حذف الخيار الفرعي
+                    optionToDelete.Options.Remove(subOptionToDelete);
+                    _options.delete(subOptionToDelete.Id);
+
+                    // حفظ التغييرات في قاعدة البيانات
+                }
+            }
+
+            // بعد الحذف، قم بإعادة توجيه المستخدم إلى صفحة الإضافة
+            return RedirectToAction("Options", new { id = productId });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteMainOption(int productId, int mainOptionId)
+        {
+            // ابحث عن الخيار الرئيسي والفرعي الذي تم حذفه
+            var option = _productOption.List();
+            var optionToDelete = option.FirstOrDefault(x => x.Id == mainOptionId);
+
+            if (optionToDelete != null)
+            {
+
+                foreach (var item in optionToDelete.Options)
+                {
+                    _options.delete(item.Id);
+                }
+
+
+                _productOption.delete(optionToDelete.Id);
+            }
+
+            // بعد الحذف، قم بإعادة توجيه المستخدم إلى صفحة الإضافة
+            return RedirectToAction("Options", new { id = productId });
+        }
+
+        [HttpPost]
+        public IActionResult AddSubOption(int productId, int mainOptionId, string subOptionName, int subOptionCount)
+        {
+            var mainOption = _productOption.Find(mainOptionId);
+            if (mainOption != null)
+            {
+                var option = new options
+                {
+                    Name = subOptionName,
+                    count = subOptionCount,
+                    productOptionsId = mainOption.Id
+                };
+
+                _options.Add(option);
+                toastNotification.AddSuccessToastMessage("تم الاضافة بنجاح");
+                return RedirectToAction("Options", new { id = productId });
+            }
+
+            return RedirectToAction("Options", new { id = productId });
+        }
+
+
+
+
     }
 }

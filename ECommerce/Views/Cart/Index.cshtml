@@ -1,0 +1,223 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@model ShoppingCart
+@inject UserManager<User> userManager;
+
+
+
+
+
+
+
+<div class="content page-container-cart" id="cart-content">
+    <div class="the-container">
+        @{
+            if(Model.Products.Count > 0)
+            {
+
+                int numProduct = 0;
+
+                @foreach (var item in Model.Products)
+                {
+                    
+                    <div class="product-cart">
+                        <form method="post" asp-action="RemoveFromCart" asp-controller="Cart">
+                            <input type="hidden" name="productId" value="@item.Id" />
+                            <button type="submit" class="delete-button">
+                                <i class="bi bi-x-circle-fill deleteProduct"></i>
+                            </button>
+                        </form>
+
+                        <div class="product-info">
+                            <a asp-action="details" asp-controller="products" asp-route-id="@item.Id" class="text-decoration-none text-reset">
+                                <img src="~/@item.image" alt="@item.Name">
+                            </a>
+
+                            <div class="product-details">
+                                <a asp-action="details" asp-controller="products" asp-route-id="@item.Id" class="text-decoration-none text-reset">
+                                    <h4 class="nameHover">@item.Name</h4>
+                                </a>
+                                <p class="product-price">
+                                    @item.price ر.س
+                                </p>
+                                <p class="product-summnay">
+                                    الإجمالي
+                                    @{
+                                        double allPriceProduct = item.price * item.Quantity;
+                                    }
+                                    <span>@allPriceProduct ر.س</span>
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <div class="product-options" style="display:inherit;">
+
+
+                            <label for="quantity">الكمية:</label>
+                            <div class="form-group quantity-btn-container">
+                                @{
+                                    if (item.Quantity < 50)
+                                    {
+                                        <form method="post" asp-action="incrementQuantity" asp-controller="Cart">
+                                            <input type="hidden" name="productId" value="@item.Id" />
+                                            <input type="hidden" name="Quantity" value="@item.Quantity" />
+                                            <button type="submit" class="btn quantity-btn" id="incrementQuantity"><i class="bi bi-plus"></i></button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn quantity-btn" id="incrementQuantity"><i class="bi bi-plus"></i></button>
+                                    }
+                                }
+
+
+                                <input type="number" class="form-control d-inline-block mx-2 quantity-input text-center px-2" id="quantity" name="quantity" value="@item.Quantity" min="1" max="50" readonly>
+                                <!-- إضافة حقل الكمية كـ input مخفي -->
+                                <input type="hidden" id="hiddenQuantity" name="hiddenQuantity" value="1">
+                                <!-- زر نقص الكمية -->
+                                @{
+                                    if (item.Quantity > 1)
+                                    {
+                                        <form method="post" asp-action="decrementQuantity" asp-controller="Cart">
+                                            <input type="hidden" name="productId" value="@item.Id" />
+                                            <input type="hidden" name="Quantity" value="@item.Quantity" />
+                                            <button type="submit" class="btn quantity-btn" id="decrementQuantity"><i class="bi bi-dash"></i></button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn quantity-btn" id="decrementQuantity"><i class="bi bi-dash"></i></button>
+                                    }
+                                }
+
+
+                            </div>
+
+
+                            <div>
+
+
+
+
+
+                                @{
+                                    if(item.ProductViewModel.SelectedOptions.Count != 0)
+                                    {
+                                        for (int i = 0, j = 0; i < item.ProductViewModel.ExistingOptions.Count && j < item.ProductViewModel.SelectedOptions.Count; i++, j++)
+                                        {
+                                            if (item.ProductViewModel.ExistingOptions[i] != null)
+                                            {
+
+                                                <input hidden asp-for="@item.ProductViewModel.SelectedOptions[j].OptionId" value="@item.ProductViewModel.ExistingOptions[i].MainOptionId" />
+                                            
+                                                <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@item.ProductViewModel.SelectedOptions[j].SubOptionId">
+                                                    <option value="" disabled>اختر @item.ProductViewModel.ExistingOptions[i].MainOptionName</option>
+                                                    @foreach (var subOption in item.ProductViewModel.ExistingOptions[i].SubOptions)
+                                                    {
+                                                        <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+                                                    }
+                                                </select>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @for (int i = 0; i < item.ProductViewModel.ExistingOptions.Count; i++)
+                                        {
+                                            <div class="form-group">
+                                                <label>@item.ProductViewModel.ExistingOptions[i].MainOptionName</label>
+                                                <input hidden asp-for="@item.ProductViewModel.SelectedOptions[i].OptionId" value="@item.ProductViewModel.ExistingOptions[i].MainOptionId" />
+                                                <select class="form-select" asp-for="@item.ProductViewModel.SelectedOptions[i].SubOptionId">
+                                                    <option value="">اختر @item.ProductViewModel.ExistingOptions[i].MainOptionName</option>
+                                                    @foreach (var subOption in item.ProductViewModel.ExistingOptions[i].SubOptions)
+                                                    {
+                                                        <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        }
+                                    }
+
+                                }
+
+
+
+
+
+                            </div>
+
+
+
+
+
+                        </div>
+
+
+
+                    </div>
+                    numProduct++;
+                }
+
+                <!-- العناصر الأخرى هنا -->
+
+                <div class="cart-total-box">
+                    <div style="display:flex; align-items:center; justify-content:space-between; position:relative; width:100%; padding: 10px 15px;">
+                        <span class="cart-total-title no-margin">
+                            <i class="bi bi-calculator"></i>
+                            مجموع السلة
+                        </span>
+                        <span class="cart-total-amount" id="cartTotal">@Model.totalPrice ر.س</span>
+                    </div>
+                </div>
+                <div class="cart-nav row shipping-bar">
+                    <div class="col-sm-9" style="width:83% !important;" id="free-shipping-bar">
+                    </div>
+                    <div class="col-sm-3 cart-next-button" style="width:17% !important;">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a asp-action="Checkout" asp-controller="Cart" id="submit_cart" class="cart-nav-solid">
+                                <span style="padding-left:10px;">إتمام الطلب</span>
+                                <i class="bi bi-arrow-left" style="font-size:18px !important; line-height:0px;"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a role="button" id="submit_cart" class="cart-nav-solid" onclick="showInPopup('@Url.Action("Login","Account",null, Context.Request.Scheme)','تسجيل دخول')">
+                                <span style="padding-left:10px;">إتمام الطلب</span>
+                                <i class="bi bi-arrow-left" style="font-size:18px !important; line-height:0px;"></i>
+                            </a>
+                        }
+
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center" style="margin-top:300px;">
+                <i class="bi bi-heartbreak" style="font-size:150px;"></i>
+                <h4 style="font-size:25px;">السلة فارغة</h4>
+
+                <a asp-action="index" asp-controller="home">
+                        <button type="button" class="btn px-xxl-5 py-2 rounded-pill mt-xl-5" style="background-color:#dfb600; font-size:20px;">العودة للمتجر</button>
+                </a>
+                    
+                </div>
+            }
+
+        }
+
+
+    </div>
+</div>
+
+
+
+@section Scripts{
+        <script>
+            document.getElementById("container").classList.remove('me-0');
+            document.getElementById("container").classList.remove('pe-0');
+        </script>
+
+
+        
+}

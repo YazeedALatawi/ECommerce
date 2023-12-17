@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ECommerce.Models.CartProducts>
+
+    <style>
+        body{
+            background-color:#555;
+        }
+    </style>
+<div class="container w-75">
+<table class="table table-responsive-sm table-dark table-hover mt-5">
+    <thead>
+        <tr>
+            <th scope="col">
+                
+            </th>
+            <th scope="col">
+                @Html.DisplayName("اسم المنتج")
+            </th>
+            <th>
+                @Html.DisplayName("الكمية")
+            </th scope="col">
+            <th>
+                @Html.DisplayName("اجمالي السعر")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    
+        <tr>
+
+            <td>
+                            <a asp-action="Details" asp-controller="Products" asp-route-Id="@item.productId">
+                <img src="~/@item.product.Image" class="img-thumbnail" width="150px" height="150px">
+                            </a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.product.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.count)
+            </td>
+            <td>
+                @{var totalPrice = item.count * item.product.Price;}
+                <p>@totalPrice</p>
+            </td>
+
+        </tr>
+
+}
+    </tbody>
+</table>
+
+
+</div>
+
+@section Scripts {
+	<script>
+		document.getElementById("container").classList.remove('me-0');
+		document.getElementById("container").classList.remove('pe-0');
+	</script>
+}

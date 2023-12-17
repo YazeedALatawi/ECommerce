@@ -1,0 +1,107 @@
+﻿@model ECommerce.ViewModel.orderAdminViewModel
+@{
+    Layout = null;
+}
+
+<link href="~/css/site.css" rel="stylesheet" />
+
+
+<table class="table table-hover table-bordered table-light">
+    <thead>
+        <tr>
+            <th scope="col">
+                
+            </th>
+            <th scope="col">
+                @Html.DisplayName("اسم المنتج")
+            </th>
+            <th>
+                @Html.DisplayName("الكمية")
+            </th scope="col">
+            <th>
+                @Html.DisplayName("اجمالي السعر")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.cartProduct) {
+    
+        <tr>
+
+            <td>
+                            <a asp-action="Details" asp-controller="Products" asp-route-Id="@item.productId">
+                <img src="~/@item.product.Image" class="img-thumbnail" width="75px" height="75px">
+                            </a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.product.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.count)
+            </td>
+            <td>
+                @{var totalPrice = item.count * item.product.Price;}
+                <p>@totalPrice</p>
+            </td>
+
+        </tr>
+
+}
+    </tbody>
+</table>
+<form method="post" asp-action="Details">
+    <div class="form-group mb-4">
+    <label class="control-label">تحديث شركة الشحن</label>
+    <select class="form-select" asp-for="shipping" aria-label="Default select example" required>
+                    <option selected value="@Model.shipping">@Model.shipping</option>
+                    @foreach (var shipping in Model.shippingList)
+                    {
+                            if(shipping.Name != Model.shipping)
+                            {
+                                <option value="@shipping.Name">@shipping.Name</option>
+                            }
+
+                    }
+                    @if(Model.shipping != "لم يحدد"){
+                        <option value="لم يحدد">لم يحدد</option>
+                    }
+                    
+    </select>
+</div>
+
+<div class="form-group">
+    <label class="control-label">تحديث حالة الطلب</label>
+    <select class="form-select" asp-for="orderState" aria-label="Default select example">
+                    <option selected value="@Model.orderState">@Model.orderState</option>
+                    @foreach (var state in Model.orderStatesList)
+                    {
+                            if(state != Model.orderState)
+                            {
+                                <option value="@state">@state</option>
+                            }
+
+                    }
+
+    </select>
+</div>
+
+<button type="submit" class="btn btn-success mt-4">حفظ</button>
+</form>
+
+
+
+<div id="loadingSpinner" style="display: none;" hidden>
+    <div class="spinner"></div>
+</div>
+
+
+
+
+
+
+<script src="~/js/site.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

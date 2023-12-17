@@ -1,6 +1,11 @@
-﻿@using Microsoft.AspNetCore.Identity;
+﻿@using ECommerce.Models.Service;
+@using Microsoft.AspNetCore.Identity;
+@using Newtonsoft.Json;
 @inject SignInManager<User> signInManager;
-@inject UserManager<User> userManager
+@inject UserManager<User> userManager;
+@inject ShoppingCartService shoppingCartService
+
+
 
 <!DOCTYPE html>
 <html lang="ar">
@@ -38,78 +43,6 @@
 </head>
 <body dir="rtl">
     <header>
-@*        <nav class="navbar navbar-expand-sm navbar-toggleable-sm bg-black navbar-light border-bottom box-shadow mb-0 p-0" style="background-color:black !important;">
-            <div class="container-fluid">
-				<a class="navbar-brand m-1" asp-area="" asp-controller="Home" asp-action="Index"><img width="200px" src="~/img/imghome/homeimg1.jpg" /></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-black mx-3 fw-bold" style="background-color:#ffff2d" asp-area="" asp-controller="Home" asp-action="Index">الصفحة الرئيسية</a>
-                        </li>
-                        <li class="nav-item">
-                            <div class="dropdown show">
-                                <a class="nav-link text-light mx-3 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    الاصناف
-                                </a>
-
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:black !important;">
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">الكل</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">الأقمشة</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">البساطير والجزم</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">الانوطه و الونقات</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">الاكسسوارات</a>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light mx-1" asp-area="" asp-controller="Home" asp-action="Privacy">الخصوصية</a>
-                        </li>
-                    </ul>
-                    <p class="text-white mb-0 ms-1">الكمية: 0</p>
-                    <p class="text-white mb-0 ms-1">الاجمالي: 0</p>
-                    <a><i class="bi bi-cart-dash-fill icon-custom ms-3"></i></a>
-                    <div class="dropdown show ms-5">
-                            @if (signInManager.IsSignedIn(User))
-                            {
-                            var user = await userManager.GetUserAsync(User);
-
-                            <a class="nav-link text-light mx-3 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                @user.FirstName @user.LastName
-                            </a>
-
-                            }
-                            else
-                            {
-                            <a class="nav-link text-light mx-3 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bi bi-person-fill icon-custom"></i>
-                            </a>
-
-                            }
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:black !important;">
-                            @if (!signInManager.IsSignedIn(User))
-                            {
-                                <a class="dropdown-item text-center dropdownCustom" role="button" onclick="showInPopup('@Url.Action("Login","Account",null, Context.Request.Scheme)','تسجيل دخول')">دخول</a>
-                                <a class="dropdown-item text-center dropdownCustom" role="button" asp-action="Register" asp-controller="Account">تسجيل</a>
-                            }
-                            else
-                            {
-                                <a class="dropdown-item text-center dropdownCustom" href="#">طلباتي</a>
-                                <a class="dropdown-item text-center dropdownCustom" href="#">بياناتي</a>
-                                <form asp-action="Logout" asp-controller="Account" method="post">
-                                    <button class="dropdown-item text-center dropdownCustom" type="submit">تسجيل خروج</button>
-                                </form>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </nav>*@
-
         <nav class="navbar navbar-expand-lg navbar-dark bg-black mb-0 p-0" style="background-color:black !important;">
             <div class="container-fluid">
                 <a class="navbar-brand m-1" asp-area="" asp-controller="Home" asp-action="Index"><img class="img-fluid" style="max-width: 150px; height: auto;" src="~/img/imghome/homeimg1.jpg" /></a>
@@ -140,10 +73,25 @@
                             <a class="nav-link text-white mx-1" asp-area="" asp-controller="Home" asp-action="Privacy">الخصوصية</a>
                         </li>
                     </ul>
-                    <div class="d-flex">
-                        <p class="text-white mb-0 ms-1">الكمية: 0</p>
-                        <p class="text-white mb-0 ms-1">الاجمالي: 0</p>
-                        <a href="#"><i class="bi bi-cart-dash-fill icon-custom ms-3 text-white"></i></a>
+
+
+
+
+
+
+
+                    <div class="d-flex align-items-center">
+                        <a asp-action="index" asp-controller="Cart"><i class="bi bi-cart-check-fill icon-custom"></i></a>
+                        @{
+                            int count = shoppingCartService.GetCartItemCount();
+                            if(count > 0)
+                            {
+                                 <span id="cart-item-count" class="text-white">@count</span>
+                            }
+
+                        }
+
+
                         <div class="dropdown show ms-5">
                             @if (signInManager.IsSignedIn(User))
                             {
@@ -167,7 +115,7 @@
                                 }
                                 else
                                 {
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">طلباتي</a>
+                                    <a class="dropdown-item text-center dropdownCustom" asp-action="index" asp-controller="Order">طلباتي</a>
                                     <a class="dropdown-item text-center dropdownCustom" href="#">بياناتي</a>
                                     <form asp-action="Logout" asp-controller="Account" method="post">
                                         <button class="dropdown-item text-center dropdownCustom" type="submit">تسجيل خروج</button>
@@ -176,6 +124,8 @@
                             </div>
                         </div>
                     </div>
+
+
                 </div>
             </div>
         </nav>
@@ -208,6 +158,21 @@
     </div>
   </div>
 </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="form-modal-crud">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Login End -->
 

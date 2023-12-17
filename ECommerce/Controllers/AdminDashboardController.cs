@@ -2,9 +2,9 @@
 
 namespace ECommerce.Controllers
 {
+    [Route("admin/dashboard/[action]/{id?}")]
     public class AdminDashboardController : Controller
     {
-        [Route("admin/dashboard/[action]/{id?}")]
 
         public IActionResult Index()
         {

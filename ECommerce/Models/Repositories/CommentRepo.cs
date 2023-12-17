@@ -27,7 +27,27 @@
 			return result;
 		}
 
-		public IList<Comment> List()
+        public IList<Comment> findAllByCartId(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool findByIdProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Comment findByIdUser(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Comment FindString(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Comment> List()
 		{
 			return db.Comments.ToList();
 		}

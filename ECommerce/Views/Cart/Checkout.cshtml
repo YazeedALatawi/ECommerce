@@ -1,0 +1,286 @@
+﻿@model ECommerce.ViewModel.CheckOutViewModel
+<style>
+    body{
+        background-color: #f8f8f8;
+    }
+        #shipping_payment_wrapper {
+            padding: 20px;
+        }
+
+        #shipping_info, #payment_info, #customerInfo {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 0px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0px;
+            
+        }
+
+        #cart_summary {
+            background-color: #fff;
+            padding: 0px;
+            border: 1px solid #fff;
+            border-radius: 2px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            margin-right:25px;
+            max-height:150px;
+            display:flex;
+            flex-direction:column;
+        }
+
+    .adressLocation {
+        border: 2px solid #dfb600;
+        padding: 10px;
+        width: 26%;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    }
+
+
+    .title{
+            align-items: center;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            margin: 0 0 20px;
+            position: relative;
+    }
+
+    .title::before{
+            align-items: center;
+            background-color: #dfb600;
+            border-radius: 50%;
+            color: black;
+            content: attr(data-step);
+            display: flex;
+            flex-direction: row;
+            font-family: Tahoma;
+            font-size: 14px;
+            font-weight: 700;
+            height: 25px;
+            justify-content: center;
+            position: absolute;
+            right: -12px;
+            top: 0;
+            width: 25px;
+            z-index: 9;
+    }
+
+    .title::after{
+            background-color: #e7e7e7;
+            border-radius: 30px;
+            content: "";
+            display: block;
+            flex: 1;
+            height: 3px;
+    }
+
+    .title-text{
+        margin-right: 20px;
+        margin-left: 15px;
+        font-weight: 900;
+        font-size: 20px;
+    }
+
+    #cart_summary ul{
+        list-style-type:none;
+        margin:0px;
+        padding:12px;
+    }
+
+    #cart_summary ul li h4{
+        font-size:14px;
+        font-weight:400;
+    }
+
+        #cart_summary ul li span{
+        font-size:14px;
+        font-weight:100;
+    }
+
+    #cart_summary ul li{
+            display: inline-flex;
+            justify-content: space-between;
+            height:auto;
+            width:100%;
+            padding: 4px 0 8px;
+            border-bottom: 1px solid #f3f3f3;
+    }
+
+    .edit-fields{
+        display: none;
+        margin-top: 10px;
+    }
+
+    .edit-fields .row .col-md-4 label , input{
+        font-size:14px;
+    }
+
+</style>
+
+
+
+
+<!-- Shipping and Payment Section -->
+<div class="container">
+            <form asp-action="CheckOut">
+                <input asp-for="totalPrice" type="hidden"/>
+    <div class="row" dir="ltr">
+     <!-- Cart Summary on the Right -->
+        <div id="cart_summary" dir="rtl" class="col-md-2 mt-5">
+            <ul>
+                <li>
+                    <h4>ملخص السله</h4>
+                    <span class="currency"><b>@Model.totalPrice</b> <small>ر.س</small></span>
+                </li>
+                <li>
+                    <h4>تكلفة الشحن</h4>
+                    <span class="currency"><b>@Model.shippingCost</b> <small>ر.س</small></span>
+                </li>
+                <li>
+                    <h4 style="font-weight:500;">اجمالي الطلب</h4>
+                    <span style="font-weight:500;"  class="currency"><b>@Model.totalPrice</b> <small>ر.س</small></span>
+                </li>
+            </ul>
+            <button type="submit" class="btn w-100 text-white" style="background-color:#dfb600; border-radius:0px; font-size:14px;">اكمال الدفع</button>
+
+            <!-- Add other summary details as needed -->
+        </div>
+
+        <div class="col-md-9 mt-5 p-0" dir="rtl">
+            <div class="row" id="customerInfo">
+                <div>
+                    <h3 style="font-size:20px; font-weight:900;">مرحبا بك @Model.firstName @Model.LastName</h3>
+                <!-- Shipping Form and Information -->
+                <!-- You can customize this section based on your requirements -->
+            </div>
+            </div>
+            <div class="row">
+                <div id="shipping_info" style="border-top: 1px solid #dee2e6; margin-top:2px;">
+                    <div class="title" data-step="1">
+
+                        <h3 class="title-text"><i class="bi bi-truck" style="margin-left:8px; margin-right:4px; font-size:22px;"></i>الشحن والتوصيل</h3>
+
+                    </div>
+
+                <p style="margin-right:3px; margin-bottom:7px;">عنوان الشحن</p>
+                <div class="adressLocation">
+                    <p style="margin-bottom:1px; font-weight:600;">@Model.City - السعودية</p>
+                    <p style="font-weight:100;">@Model.District - @Model.Street</p>
+
+                        <p style="margin-bottom:7px; font-size:14px; cursor:pointer;" onclick="showEditFields()"><i class="bi bi-pencil" style="margin-left:5px;"></i>تعديل</p>
+
+                </div>
+                    <div class="edit-fields">
+                        <!-- أضف حقول التحرير هنا -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="field1">اختر المدينة</label>
+@*                                <input type="text" id="field1" name="field1" class="form-control">*@
+                                <select asp-for="City" class="form-select" id="field1" aria-label="Default select example" required>
+                                    <option disabled value="none">اختار المدينة</option>
+                                    @foreach (var city in Model.AvailableCities)
+                                    {
+                                        if(city == Model.City)
+                                        {
+                                            <option selected value="@city">@city</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@city">@city</option>
+                                        }
+
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="field2">الحي</label>
+                                <input type="text" asp-for="District" value="@Model.District" id="field2" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="field3">الشارع</label>
+                                    <input type="text" asp-for="Street" value="@Model.Street" id="field3" class="form-control">
+                            </div>
+                            <!-- يمكنك إضافة المزيد من الأعمدة حسب الحاجة -->
+                            <div class="d-flex justify-content-center mt-5">
+                                <!-- mt-3 لإضافة هامش أعلى -->
+                                <button type="button" class="btn text-white" style="background-color:#dfb600; font-size:14px; font-weight:500;" onclick="saveChanges()">حفظ التغييرات</button>
+                            </div>
+                           
+                        </div>
+                    </div>
+                <!-- Shipping Form and Information -->
+                <!-- You can customize this section based on your requirements -->
+            </div>
+            </div>
+
+            <div class="row">
+                <div id="payment_info">
+                <div class="title" data-step="2">
+
+                        <h3 class="title-text"><i class="bi bi-credit-card" style="margin-left:8px; margin-right:4px; font-size:22px;"></i>الدفع</h3>
+
+                </div>
+                <p class="mt-5 text-center">هذه الخدمة غير متوفرة</p>
+                <!-- Payment Form and Information -->
+                <!-- You can customize this section based on your requirements -->
+
+                    <button type="submit" class="btn w-100 text-white mt-5" style="background-color:#dfb600; border-radius:0px; font-size:14px;">اكمال الدفع</button>
+            </div>
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+
+                    </form>  
+</div>
+
+<!-- Cart Summary in the Top Left -->
+
+
+@section Scripts{
+            <script>
+                document.getElementById("container").classList.remove('me-0');
+                document.getElementById("container").classList.remove('pe-0');
+            </script>
+
+             <script>
+                function showEditFields() {
+                    var editFields = document.querySelector('.edit-fields');
+                    editFields.style.display = 'block';
+                }
+
+                function saveChanges() {
+                    var city = document.getElementById('field1').value;
+                    var district = document.getElementById('field2').value;
+                    var street = document.getElementById('field3').value;
+                    if (city.trim().length < 3 || district.trim().length < 3 || street.trim().length < 3 || city.trim().toLowerCase() === 'none') {
+                        alert('يرجى ملء جميع حقول العنوان بنصوص طولها 3 أحرف على الأقل');
+                        return;
+                    }
+
+                    if (city.trim().length > 15 || district.trim().length > 15 || street.trim().length > 15){
+                        alert('يجب الا تزيد عدد الاحرف عن 15 حرف لكل حقل');
+                        return;
+                    }
+                    
+                    var addressLocation = document.querySelector('.adressLocation');
+                    addressLocation.innerHTML = `
+                                <p style="margin-bottom: 1px; font-weight: 600;">${city} - السعودية</p>
+                                <p style="font-weight: 100;">${district} - ${street}</p>
+                                <p style="margin-bottom: 7px; font-size: 14px; cursor: pointer;" onclick="showEditFields()">
+                                    <i class="bi bi-pencil" style="margin-left: 5px;"></i>تعديل
+                                </p>
+                            `;
+
+                    // إخفاء حقول التحرير
+                    var editFields = document.querySelector('.edit-fields');
+                    editFields.style.display = 'none';
+                }
+            </script>
+
+}

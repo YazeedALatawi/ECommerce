@@ -13,6 +13,20 @@ showInPopup = (url, title) => {
     })
 }
 
+showInPopupCrud = (url, title) => {
+    $.ajax({
+        type: "GET",
+        url: url,
+        success: function (res) {
+            $("#form-modal-crud .modal-body").html(res);
+            $("#form-modal-crud .modal-title").html(title);
+            $("#form-modal-crud").modal('show')
+
+
+        }
+    })
+}
+
 
     var isSubmitting = false;
 
@@ -113,4 +127,5 @@ document.getElementById('showImageInNewTab').addEventListener('click', function 
     var imageSource = document.getElementById('imageToShow').src;
     window.open(imageSource, '_blank');
 });
+
 

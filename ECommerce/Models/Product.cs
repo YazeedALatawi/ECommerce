@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using ECommerce.ViewModel;
 
 namespace ECommerce.Models
 {
@@ -9,6 +10,9 @@ namespace ECommerce.Models
 		[Key]
 		public int Id { get; set; }
 		[Required]
+        public int CategoryId { get; set; }
+
+        [ForeignKey("CategoryId")]
 		public Category category { get; set; }
 		[Required,MaxLength(60), MinLength(1)]
 		public string Name { get; set; }
@@ -17,7 +21,7 @@ namespace ECommerce.Models
 		public string? MadeIn { get; set; }
 		[Required]
 		public int Count { get; set;}
-		[Required, MaxLength(500000)]
+		[Required]
 		public double Price { get; set;}
 		[MinLength(1), MaxLength(100)]
 		public int? Discount { get; set;}
@@ -25,5 +29,8 @@ namespace ECommerce.Models
 		[AllowNull]
 		public double? size { get; set; }
 		public List<Comment> comments { get; set; }
-	}
+		[NotMapped]
+        public ProductViewModel? ProductViewModel { get; set; }
+
+    }
 }

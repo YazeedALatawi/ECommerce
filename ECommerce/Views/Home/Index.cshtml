@@ -14,7 +14,6 @@
 </div>
 
 
-
 <div class="container mt-5" style="background-color: rgb(248, 245, 242) !important; box-shadow:rgba(21, 24, 25, 0.1) 0px 2px 10px 0px!important;">
     <h5 class="mb-4">جميع المنتجات</h5>
 
@@ -29,9 +28,21 @@
                         <div class="card-body">
                             <h5 class="card-title mt-2 mb-4">@item.Name</h5>
                             <div class="d-flex justify-content-between align-items-center">
-
-                                <p class="card-text">@item.Price ر.س</p>
-                                <a href="#" class="btn btn-light btnCart"><i class="bi bi-cart"></i></a>
+                                @{
+                                    if(item.Discount > 0 && item.Discount != null)
+                                    {
+                                        <p class="card-text">@item.Price ر.س <span style="color:green" class="pe-5">خصم(%@item.Discount)</span></p>
+                                    }
+                                    else
+                                    {
+                                        <p class="card-text">@item.Price ر.س</p>
+                                    }
+                                }
+                                
+                                <form method="post" asp-action="AddToCart" asp-controller="Cart" asp-route-id="@item.Id">
+                                    <button type="submit" class="btn btn-light btnCart"><i class="bi bi-cart"></i></button>
+                                </form>
+                                
 
                             </div>
                         </div>

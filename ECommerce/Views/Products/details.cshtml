@@ -10,26 +10,69 @@
         <div class="row">
             <div class="col-md-12">
                 <!-- اسم المنتج -->
-                <h4 class="card-title">@Model.Name</h4>
+                <h4 class="card-title mt-2 pe-2">@Model.Name</h4>
                 <!-- سعر المنتج -->
-                <h5 class="card-text" style="color:rgb(175, 155, 65);">50 ر.س</h5>
+                <h5 class="card-text pe-2" style="color:rgb(175, 155, 65);">50 ر.س</h5>
                 <!-- صورة المنتج -->
-                <img src="~/@Model.Image" class="card-img-top mt-3 mb-3 border-2 shadow" alt="Product Image">
-                <p class="card-text">الوصف : @Model.Description</p>
-                <p class="card-text">الصناعة : @Model.MadeIn</p>
+                <img src="~/@Model.Image" class="card-img-top mt-4 mb-4 border-2 shadow" alt="Product Image">
+                @if(Model.Description != null)
+                {
+                    <p class="card-text">الوصف : @Model.Description</p>
+                }
+                
+                @if(Model.MadeIn != null)
+                {
+                    <p class="card-text">الصناعة : @Model.MadeIn</p>
+                }
+                
 
                 <div class="card-body text-right">
                     <!-- فورم لتحديد الكمية -->
-                    <form>
-                        <label for="quantity">الكمية:</label>
+                    <form method="post" asp-action="AddToCart" asp-controller="Cart" asp-route-id="@Model.Id" onsubmit="updateQuantity()">
+                       @* @{
+                            foreach(var item in Model.ProductViewModel.ExistingOptions)
+                            {
+
+                                <div class="form-group">
+                                    <label >@item.MainOptionName</label>
+                                    <select class="form-select" asp-for="ProductViewModel.ExistingOptions" style="max-width:50%">
+                                        <option selected disabled>اختار @item.MainOptionName</option>
+                                        @foreach(var sub in item.SubOptions)
+                                        {
+                                            <option value="@sub.SubOptionId">@sub.SubOptionName</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                        }*@
+
+                        @for (int i=0; i < Model.ProductViewModel.ExistingOptions.Count; i++)
+                        {
+                            <div class="form-group">
+                                <label>@Model.ProductViewModel.ExistingOptions[i].MainOptionName</label>
+                                <input hidden asp-for="ProductViewModel.SelectedOptions[i].OptionId" value="@Model.ProductViewModel.ExistingOptions[i].MainOptionId" />
+                                <select class="form-select" asp-for="ProductViewModel.SelectedOptions[i].SubOptionId">
+                                    <option value="">اختر @Model.ProductViewModel.ExistingOptions[i].MainOptionName</option>
+                                    @foreach (var subOption in Model.ProductViewModel.ExistingOptions[i].SubOptions)
+                                    {
+                                        <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+
+
+                        <label for="quantity" class="mt-3">الكمية:</label>
                         <div class="form-group quantity-btn-container">
                             <button type="button" class="btn quantity-btn" id="decrementQuantity"><i class="bi bi-dash"></i></button>
-                            <input type="number" class="form-control d-inline-block mx-2 quantity-input text-center px-2" id="quantity" name="quantity" value="1" min="1" readonly>
+                            <input type="number" class="form-control d-inline-block mx-2 quantity-input text-center px-2" id="quantity" name="quantity" value="1" min="1" max="50" readonly>
+                            <!-- إضافة حقل الكمية كـ input مخفي -->
+                            <input type="hidden" id="hiddenQuantity" name="hiddenQuantity" value="1">
                             <!-- زر نقص الكمية -->
                             <button type="button" class="btn quantity-btn" id="incrementQuantity"><i class="bi bi-plus"></i></button>
                         </div>
                         <!-- زر الإرسال -->
-                        <button type="submit" class="btn w-100 mt-4 btnHover" style="background-color:#ffff2d">إضافة إلى السلة <i class="bi bi-cart"></i></button>
+                        <button type="submit" class="btn w-100 mt-4 btnHover" style="background-color:#dfb600">إضافة إلى السلة <i class="bi bi-cart"></i></button>
                     </form>
                 </div>
             </div>
@@ -53,5 +96,13 @@
         document.getElementById('decrementQuantity').addEventListener('click', function () {
             document.getElementById('quantity').stepDown();
         });
+    </script>
+
+    <script>
+        function updateQuantity() {
+            var quantityInput = document.getElementById("quantity");
+            var hiddenQuantityInput = document.getElementById("hiddenQuantity");
+            hiddenQuantityInput.value = quantityInput.value;
+        }
     </script>
 }

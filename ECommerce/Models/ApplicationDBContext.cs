@@ -28,8 +28,11 @@ namespace ECommerce.Models
 		public DbSet<Product> Products { get; set; }
 		public DbSet<Order> Orders { get; set; }
 		public DbSet<Comment> Comments { get; set; }
-		public DbSet<FinalCart> FinalCarts { get; set; }
+		public DbSet<CartProducts> FinalCarts { get; set; }
 		public DbSet<Receipt> Receipts { get; set; }
 		public DbSet<Shipping> Shippings { get; set; }
+		public DbSet<productOptions> ProductOptions { get; set; }
+		public DbSet<options> options { get; set; }
+		public DbSet<CartPrdouctOptions> CartProductsOptions { get; set; }
 	}
 }

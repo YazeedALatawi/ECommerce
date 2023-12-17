@@ -1,7 +1,9 @@
 using ECommerce.Models;
 using ECommerce.Models.Repositories;
+using ECommerce.Models.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NToastNotify;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,14 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 	ToastClass = "mt-5",
 });
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+	options.IdleTimeout = TimeSpan.FromMinutes(30);
+	options.Cookie.HttpOnly = true;
+	options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
@@ -28,6 +38,15 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 builder.Services.AddScoped<IOperations<Product>, ProductRepo>();
 builder.Services.AddScoped<IOperations<Category>, CategoryRepo>();
 builder.Services.AddScoped<IOperations<Shipping>, ShippingRepo>();
+builder.Services.AddScoped<IOperations<Cart>, CartRepo>();
+builder.Services.AddScoped<IOperations<Order>, OrderRepo>();
+builder.Services.AddScoped<IOperations<CartProducts>, CartProductsRepo>();
+builder.Services.AddScoped<IOperations<User>, UserRepo>();
+builder.Services.AddScoped<IOperations<productOptions>, productOptionsRepo>();
+builder.Services.AddScoped<IOperations<options>, optionRepo>();
+builder.Services.AddScoped<IOperations<CartPrdouctOptions>, CartPrdouctOptionsRepo>();
+builder.Services.AddTransient<ShoppingCartService>();
+
 
 builder.Services.AddIdentity<User, IdentityRole>(x => x.Password.RequireNonAlphanumeric = false).AddEntityFrameworkStores<ApplicationDBContext>();
 
@@ -47,6 +66,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();;
 
 app.UseAuthorization();
