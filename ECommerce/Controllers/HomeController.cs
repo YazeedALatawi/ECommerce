@@ -49,67 +49,67 @@ namespace ECommerce.Controllers
 
 
         public void ChecktheSession()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                var productsSession = _shoppingCartService.GetShoppingCart();
-                if (productsSession == null || productsSession.Products.Count == 0)
-                {
+         {
+             if (User.Identity.IsAuthenticated)
+             {
+                 var productsSession = _shoppingCartService.GetShoppingCart();
+                 if (productsSession == null || productsSession.Products.Count == 0)
+                 {
 
-                }
-                else
-                {
-                    var theCart = _cart.findByIdUser(_userManager.GetUserId(User));
-                    if (theCart == null)
-                    {
-                        var newCart = new Cart
-                        {
-                            userId = _userManager.GetUserId(User)
-                        };
-                        _cart.Add(newCart);
-                        var Thecart = _cart.findByIdUser(_userManager.GetUserId(User));
-                        foreach (var item in productsSession.Products)
-                        {
-                            _cartProducts.Add(new CartProducts
-                            {
-                                cartId = Thecart.Id,
-                                productId = item.Id,
-                                count = item.Quantity,
-                            });
+                 }
+                 else
+                 {
+                     var theCart = _cart.findByIdUser(_userManager.GetUserId(User));
+                     if (theCart == null)
+                     {
+                         var newCart = new Cart
+                         {
+                             userId = _userManager.GetUserId(User)
+                         };
+                         _cart.Add(newCart);
+                         var Thecart = _cart.findByIdUser(_userManager.GetUserId(User));
+                         foreach (var item in productsSession.Products)
+                         {
+                             _cartProducts.Add(new CartProducts
+                             {
+                                 cartId = Thecart.Id,
+                                 productId = item.Id,
+                                 count = item.Quantity,
+                             });
 
-                        }
+                         }
 
-                        _shoppingCartService.ClearSession();
+                         _shoppingCartService.ClearSession();
 
-                    }
-                    else
-                    {
-                        var Thecart = _cart.findByIdUser(_userManager.GetUserId(User));
-                        var alltheProductInCart = _cartProducts.findAllByCartId(theCart.Id);
+                     }
+                     else
+                     {
+                         var Thecart = _cart.findByIdUser(_userManager.GetUserId(User));
+                         var alltheProductInCart = _cartProducts.findAllByCartId(theCart.Id);
 
-                        foreach (var item in productsSession.Products)
-                        {
-                            var isFound = _cartProducts.findByIdProduct(item.Id);
-                            if (!isFound)
-                            {
-                                _cartProducts.Add(new CartProducts
-                                {
-                                    cartId = Thecart.Id,
-                                    productId = item.Id,
-                                    count = item.Quantity,
-                                });
-                            }
+                         foreach (var item in productsSession.Products)
+                         {
+                             var isFound = _cartProducts.findByIdProduct(item.Id);
+                             if (!isFound)
+                             {
+                                 _cartProducts.Add(new CartProducts
+                                 {
+                                     cartId = Thecart.Id,
+                                     productId = item.Id,
+                                     count = item.Quantity,
+                                 });
+                             }
 
-                        }
+                         }
 
 
-                        _shoppingCartService.ClearSession();
-                    }
-                }
-            }
-            
+                         _shoppingCartService.ClearSession();
+                     }
+                 }
+             }
 
-        }
+
+         }
 
     }
 }

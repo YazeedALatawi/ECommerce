@@ -98,7 +98,6 @@
 
 
 
-
                                 @{
                                     var existingOptionsCount = item.ProductViewModel.ExistingOptions.Count;
                                     var selectedOptionsCount = item.ProductViewModel.SelectedOptions?.Count ?? 0;
@@ -114,10 +113,17 @@
                                             <input hidden asp-for="@selectedOption.OptionId" value="@mainOption.MainOptionId" />
 
                                             <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@selectedOption.SubOptionId">
-                                                <option value="" disabled>اختر @mainOption.MainOptionName</option>
                                                 @foreach (var subOption in mainOption.SubOptions)
                                                 {
-                                                    <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+                                                    if(subOption.SubOptionId == -1)
+                                                    {
+                                                        <option disabled value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+                                                    }
                                                 }
                                             </select>
 
@@ -129,11 +135,18 @@
                                             <div class="form-group">
                                                 <label>@mainOption.MainOptionName</label>
                                                 <input hidden asp-for="@mainOption.MainOptionId" value="@mainOption.MainOptionId" />
-                                                <select class="form-select text-center" data-index="@i" id="subOptionSelect_@i" style="padding:3px; width:30%;" asp-for="@mainOption.SubOptions[j].SubOptionId">
-                                                    <option value="" selected>اختر @mainOption.MainOptionName</option>
+                                                <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@mainOption.SubOptions[j].SubOptionId" name="SelectedOptions[@j].SubOptionId">
                                                     @foreach (var subOption in mainOption.SubOptions)
                                                     {
-                                                        <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+                                                        if(subOption.SubOptionId == -1)
+                                                        {
+                                                            <option disabled value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@subOption.SubOptionId">@subOption.SubOptionName</option>
+
+                                                        }
                                                     }
                                                 </select>
                                             </div>
@@ -141,17 +154,10 @@
                                     }
                                     
                                 }
-
-
-    
-
-
-
-
-
+                                
 
                             </div>
-
+                            
 
 
 
@@ -181,10 +187,32 @@
                     <div class="col-sm-3 cart-next-button" style="width:17% !important;">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <a asp-action="Checkout" asp-controller="Cart" id="submit_cart" class="cart-nav-solid">
-                                <span style="padding-left:10px;">إتمام الطلب</span>
-                                <i class="bi bi-arrow-left" style="font-size:18px !important; line-height:0px;"></i>
-                            </a>
+                            //<a asp-action="Checkout" asp-controller="Cart" id="submit_cart" class="cart-nav-solid">
+                            //    <span style="padding-left:10px;">إتمام الطلب</span>
+                            //    <i class="bi bi-arrow-left" style="font-size:18px !important; line-height:0px;"></i>
+                            //</a>
+                                <!-- إضافة الحقول المطلوبة من نموذج CheckoutViewModel -->
+                            <form asp-action="_Checkout" asp-controller="Cart" method="post">
+                                <input type="hidden" asp-for="totalPrice" />
+
+                                @for (int i = 0; i < Model.Products.Count; i++)
+                                {
+                                    <input type="hidden" asp-for="Products[i].Id" />
+                                    <!-- الخصائص الأخرى للمنتج -->
+                                    @for (int j = 0; j < Model.Products[i].ProductViewModel.SelectedOptions.Count; j++)
+                                    {
+                                        <input type="hidden" asp-for="Products[i].ProductViewModel.SelectedOptions[j].OptionId" />
+                                        <input type="hidden" asp-for="Products[i].ProductViewModel.SelectedOptions[j].SubOptionId" />
+                                        <!-- إضافة حقول أخرى إذا كانت مطلوبة -->
+                                    }
+                                }
+
+                                <button type="submit" class="cart-nav-solid">
+                                    <span style="padding-left:10px;">إتمام الطلب</span>
+                                    <i class="bi bi-arrow-left" style="font-size:18px !important; line-height:0px;"></i>
+                                </button>
+                            </form>
+
                         }
                         else
                         {

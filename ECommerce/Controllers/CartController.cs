@@ -166,7 +166,7 @@ namespace ECommerce.Controllers
                         var theCartProducts = _cartProducts.List();
 
 
-                        if (prod.ProductViewModel == null || prod.ProductViewModel.SelectedOptions == null)
+                        if (prod.ProductViewModel == null || prod.ProductViewModel.SelectedOptions == null || prod.ProductViewModel.SelectedOptions[0].SubOptionId == 0 || prod.ProductViewModel.SelectedOptions[0].OptionId == 0)
                         {
 
                         }
@@ -222,7 +222,7 @@ namespace ECommerce.Controllers
 
                         _cartProducts.Add(cartProduct);
                         var theCartProducts = _cartProducts.List();
-                        if (prod.ProductViewModel == null || prod.ProductViewModel.SelectedOptions == null)
+                        if (prod.ProductViewModel == null || prod.ProductViewModel.SelectedOptions == null || prod.ProductViewModel.SelectedOptions[0].SubOptionId == 0 || prod.ProductViewModel.SelectedOptions[0].OptionId == 0)
                         {
 
                         }
@@ -339,9 +339,10 @@ namespace ECommerce.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult Checkout()
+        [HttpPost]
+        public IActionResult _Checkout(ShoppingCart shoppingCart)
         {
+
             if (User.Identity.IsAuthenticated)
             {
 
@@ -399,6 +400,7 @@ namespace ECommerce.Controllers
         [HttpPost]
         public IActionResult Checkout(CheckOutViewModel view)
         {
+
             if (User.Identity.IsAuthenticated)
             {
                 var TheCart = _cart.findByIdUser(_userManager.GetUserId(User));
@@ -522,7 +524,16 @@ namespace ECommerce.Controllers
             var theCartproducts = _cartProducts.List().Where(a => a.cartId == TheCart.Id).ToList();
             _model.SelectedOptions = _cartProductsOptions.List().Where(a => a.ProductID == productID && a.cartID == cart.Id).Select(po => new ProductOptionViewModel { OptionId = po.MainOptionID, SubOptionId = po.SubOptionID }).ToList();
 
-
+            foreach (var mainOption in _model.ExistingOptions)
+            {
+                mainOption.SubOptions.Insert(0, new SubOptionViewModel
+                {
+                    SubOptionId = -1,
+                    SubOptionName = "اختار " + mainOption.MainOptionName,
+                    MainOptionId = mainOption.MainOptionId,
+                    SubOptionCount = -1
+                });
+            }
             return _model;
         }
     }
