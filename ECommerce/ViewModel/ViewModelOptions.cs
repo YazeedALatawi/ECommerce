@@ -36,11 +36,7 @@
         public int SubOptionId { get; set; }
     }
 
-    public class CartOptionFinish
-    {
-        public List<MainOptionViewModel> ThaAllOption { get; set; }
-        public List<ProductOptionViewModel> SelectedOptions { get; set; }
-    }
+
 
 
 }

@@ -340,7 +340,7 @@ namespace ECommerce.Controllers
         }
 
         [HttpPost]
-        public IActionResult _Checkout(ShoppingCart shoppingCart)
+        public IActionResult _Checkout(ShoppingCart shopping)
         {
 
             if (User.Identity.IsAuthenticated)

@@ -1,10 +1,7 @@
-﻿@using Microsoft.AspNetCore.Identity;
+﻿@using ECommerce.ViewModel;
+@using Microsoft.AspNetCore.Identity;
 @model ShoppingCart
 @inject UserManager<User> userManager;
-
-
-
-
 
 
 
@@ -20,12 +17,12 @@
                 {
                     
                     <div class="product-cart">
-                        <form method="post" asp-action="RemoveFromCart" asp-controller="Cart">
+                        <!-- <form method="post" asp-action="RemoveFromCart" asp-controller="Cart">-->
                             <input type="hidden" name="productId" value="@item.Id" />
                             <button type="submit" class="delete-button">
                                 <i class="bi bi-x-circle-fill deleteProduct"></i>
                             </button>
-                        </form>
+                        <!-- </form>-->
 
                         <div class="product-info">
                             <a asp-action="details" asp-controller="products" asp-route-id="@item.Id" class="text-decoration-none text-reset">
@@ -58,11 +55,11 @@
                                 @{
                                     if (item.Quantity < 50)
                                     {
-                                        <form method="post" asp-action="incrementQuantity" asp-controller="Cart">
+                                        <!--<form method="post" asp-action="incrementQuantity" asp-controller="Cart">-->
                                             <input type="hidden" name="productId" value="@item.Id" />
                                             <input type="hidden" name="Quantity" value="@item.Quantity" />
                                             <button type="submit" class="btn quantity-btn" id="incrementQuantity"><i class="bi bi-plus"></i></button>
-                                        </form>
+                                        <!--</form>-->
                                     }
                                     else
                                     {
@@ -78,11 +75,11 @@
                                 @{
                                     if (item.Quantity > 1)
                                     {
-                                        <form method="post" asp-action="decrementQuantity" asp-controller="Cart">
+                                        <!--<form method="post" asp-action="decrementQuantity" asp-controller="Cart">-->
                                             <input type="hidden" name="productId" value="@item.Id" />
                                             <input type="hidden" name="Quantity" value="@item.Quantity" />
                                             <button type="submit" class="btn quantity-btn" id="decrementQuantity"><i class="bi bi-dash"></i></button>
-                                        </form>
+                                        <!--</form>-->
                                     }
                                     else
                                     {
@@ -110,12 +107,12 @@
                                         if (selectedOption != null && selectedOption.OptionId == mainOption.MainOptionId)
                                         {
                                             <!-- معالجة العناصر المحددة -->
-                                            <input hidden asp-for="@selectedOption.OptionId" value="@mainOption.MainOptionId" />
+                                            <input hidden asp-for="Products[numProduct].ProductViewModel.SelectedOptions[j].OptionId" value="@mainOption.MainOptionId" />
 
-                                            <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@selectedOption.SubOptionId">
+                                            <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="Products[numProduct].ProductViewModel.SelectedOptions[j].SubOptionId" >
                                                 @foreach (var subOption in mainOption.SubOptions)
                                                 {
-                                                    if(subOption.SubOptionId == -1)
+                                                    if (subOption.SubOptionId == -1)
                                                     {
                                                         <option disabled value="@subOption.SubOptionId">@subOption.SubOptionName</option>
 
@@ -135,10 +132,10 @@
                                             <div class="form-group">
                                                 <label>@mainOption.MainOptionName</label>
                                                 <input hidden asp-for="@mainOption.MainOptionId" value="@mainOption.MainOptionId" />
-                                                <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@mainOption.SubOptions[j].SubOptionId" name="SelectedOptions[@j].SubOptionId">
+                                                <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@mainOption.SubOptions[j].SubOptionId">
                                                     @foreach (var subOption in mainOption.SubOptions)
                                                     {
-                                                        if(subOption.SubOptionId == -1)
+                                                        if (subOption.SubOptionId == -1)
                                                         {
                                                             <option disabled value="@subOption.SubOptionId">@subOption.SubOptionName</option>
                                                         }
@@ -152,21 +149,19 @@
                                             </div>
                                         }
                                     }
-                                    
-                                }
-                                
+
+                                }   
 
                             </div>
                             
-
-
-
-
                         </div>
 
 
 
                     </div>
+                    <!-- Inside the loop for products -->
+                    <input type="hidden" name="Products[@numProduct].SelectedOptions" value="1" />
+
                     numProduct++;
                 }
 
@@ -187,23 +182,31 @@
                     <div class="col-sm-3 cart-next-button" style="width:17% !important;">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            //<a asp-action="Checkout" asp-controller="Cart" id="submit_cart" class="cart-nav-solid">
+                            //<a asp-action="_Checkout" asp-controller="Cart" id="submit_cart" class="cart-nav-solid">
                             //    <span style="padding-left:10px;">إتمام الطلب</span>
                             //    <i class="bi bi-arrow-left" style="font-size:18px !important; line-height:0px;"></i>
                             //</a>
-                                <!-- إضافة الحقول المطلوبة من نموذج CheckoutViewModel -->
-                            <form asp-action="_Checkout" asp-controller="Cart" method="post">
-                                <input type="hidden" asp-for="totalPrice" />
+                            <!-- إضافة الحقول المطلوبة من نموذج CheckoutViewModel -->
 
+
+                            <form asp-action="_Checkout" asp-controller="Cart" method="post">
                                 @for (int i = 0; i < Model.Products.Count; i++)
                                 {
-                                    <input type="hidden" asp-for="Products[i].Id" />
-                                    <!-- الخصائص الأخرى للمنتج -->
-                                    @for (int j = 0; j < Model.Products[i].ProductViewModel.SelectedOptions.Count; j++)
+                                    var product = Model.Products[i];
+                                    var selectedOptions = product.ProductViewModel?.SelectedOptions ?? new List<ProductOptionViewModel>();
+
+                                    <input type="hidden" name="Products[@i].Id" value="@product.Id" />
+                                    <input type="hidden" name="Products[@i].Quantity" value="@product.Quantity" />
+
+                                    <!-- Other product fields... -->
+                                    @for (int j = 0; j < selectedOptions.Count; j++)
                                     {
-                                        <input type="hidden" asp-for="Products[i].ProductViewModel.SelectedOptions[j].OptionId" />
-                                        <input type="hidden" asp-for="Products[i].ProductViewModel.SelectedOptions[j].SubOptionId" />
-                                        <!-- إضافة حقول أخرى إذا كانت مطلوبة -->
+                                        var selectedOption = selectedOptions[j];
+
+                                        <input type="hidden" name="Products[@i].ProductViewModel.SelectedOptions[@j].OptionId" value="@selectedOption.OptionId" />
+                                        <input type="hidden" name="Products[@i].ProductViewModel.SelectedOptions[@j].SubOptionId" value="@selectedOption.SubOptionId" />
+
+
                                     }
                                 }
 
@@ -251,6 +254,5 @@
             document.getElementById("container").classList.remove('me-0');
             document.getElementById("container").classList.remove('pe-0');
         </script>
-
         
 }

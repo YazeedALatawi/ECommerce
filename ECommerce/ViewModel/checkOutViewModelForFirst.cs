@@ -2,9 +2,18 @@
 {
     public class checkOutViewModelForFirst
     {
-        public List<int> ProductIds { get; set; }
-        public List<int> Quantities { get; set; }
-        public List<int> MainOptionIds { get; set; }
-        public List<int> SubOptionIds {get; set;}
+        public int ProductID { get; set; }
+        public List<mainOption> allOptions { get; set; }
+    }
+    public class mainOption
+    {
+        public int MainOptionID { get; set; }
+        public string MainOptionName { get; set; }
+        public List<SubOptions> subOptions { get; set; }
+    }
+    public class SubOptions
+    {
+        public int SubOptionID { get; set; }
+        public string SubOptionName { get; set; }
     }
 }
