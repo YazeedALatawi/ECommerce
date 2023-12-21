@@ -35,6 +35,7 @@ namespace ECommerce.Controllers
             _options = options;
             _cartProductsOptions = cartProductsOptions;
         }
+
         public IActionResult Index()
         {
             if (!User.Identity.IsAuthenticated)
@@ -297,6 +298,7 @@ namespace ECommerce.Controllers
 
 
         [HttpPost]
+
         public IActionResult incrementQuantity(int productId, int quantity)
         {
             if (!User.Identity.IsAuthenticated)
@@ -313,12 +315,14 @@ namespace ECommerce.Controllers
                 quantity++;
                 theProduct.count = quantity;
                 _cartProducts.update(theProduct);
-                return RedirectToAction("Index");
+                //return RedirectToAction("Index");
+                return Json(theProduct.count);
             }
 
         }
 
         [HttpPost]
+
         public IActionResult decrementQuantity(int productId, int quantity)
         {
             if (!User.Identity.IsAuthenticated)
@@ -335,11 +339,15 @@ namespace ECommerce.Controllers
                 quantity--;
                 theProduct.count = quantity;
                 _cartProducts.update(theProduct);
-                return RedirectToAction("Index");
+                //return RedirectToAction("Index");
+                return Json(theProduct.count);
+
             }
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        
         public IActionResult _Checkout(ShoppingCart shopping)
         {
 
@@ -524,16 +532,16 @@ namespace ECommerce.Controllers
             var theCartproducts = _cartProducts.List().Where(a => a.cartId == TheCart.Id).ToList();
             _model.SelectedOptions = _cartProductsOptions.List().Where(a => a.ProductID == productID && a.cartID == cart.Id).Select(po => new ProductOptionViewModel { OptionId = po.MainOptionID, SubOptionId = po.SubOptionID }).ToList();
 
-            foreach (var mainOption in _model.ExistingOptions)
-            {
-                mainOption.SubOptions.Insert(0, new SubOptionViewModel
-                {
-                    SubOptionId = -1,
-                    SubOptionName = "اختار " + mainOption.MainOptionName,
-                    MainOptionId = mainOption.MainOptionId,
-                    SubOptionCount = -1
-                });
-            }
+            //foreach (var mainOption in _model.ExistingOptions)
+            //{
+            //    mainOption.SubOptions.Insert(0, new SubOptionViewModel
+            //    {
+            //        SubOptionId = -1,
+            //        SubOptionName = "اختار " + mainOption.MainOptionName,
+            //        MainOptionId = mainOption.MainOptionId,
+            //        SubOptionCount = -1
+            //    });
+            //}
             return _model;
         }
     }

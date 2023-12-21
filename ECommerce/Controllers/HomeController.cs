@@ -28,8 +28,9 @@ namespace ECommerce.Controllers
             _cartProducts= cartProducts;
 
         }
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
-		public IActionResult Index()
+        public IActionResult Index()
 		{
 			var products = _products.List().ToList();
             ChecktheSession();
