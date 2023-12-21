@@ -10,11 +10,12 @@
 <div class="content page-container-cart" id="cart-content">
     <div class="the-container">
         @{
-            if(Model.Products.Count > 0)
+        <form id="submitForm" asp-action="_Checkout" asp-controller="Cart" method="post">
+            @if(Model.Products.Count > 0)
             {
 
                 int numProduct = 0;
-                <form id="submitForm" asp-action="_Checkout" asp-controller="Cart" method="post">
+
                 @foreach (var item in Model.Products)
                 {
                     
@@ -57,11 +58,11 @@
                                 @{
                                     if (item.Quantity < 50)
                                     {
-                                            <form method="post" id="IncrementForm" asp-action="incrementQuantity" asp-controller="Cart">
-                                            <input type="hidden" name="productId" asp-for="Products[numProduct].Id" />
-                                            <input type="hidden" name="Quantity" value="@item.Quantity" />
-                                            <button form="IncrementForm" type="submit" class="btn quantity-btn" id="incrementQuantity"><i class="bi bi-plus"></i></button>
-                                            </form>
+                                            //<form method="post" id="IncrementForm" asp-action="incrementQuantity" asp-controller="Cart">
+                                            //<input type="hidden" name="productId" asp-for="Products[numProduct].Id" />
+                                            //<input type="hidden" name="Quantity" value="@item.Quantity" />
+                                            //<button form="IncrementForm" type="submit" class="btn quantity-btn" id="incrementQuantity"><i class="bi bi-plus"></i></button>
+                                            //</form>
                                     }
                                     else
                                     {
@@ -77,11 +78,11 @@
                                 @{
                                     if (item.Quantity > 1)
                                     {
-                                        <form method="post" id="decrementForm" asp-action="decrementQuantity" asp-controller="Cart">
-                                                <input type="hidden" name="productId" asp-for="Products[numProduct].Id" />
-                                            <input type="hidden" name="Quantity" value="@item.Quantity" />
-                                            <button form="decrementForm" type="submit" class="btn quantity-btn" id="decrementQuantity"><i class="bi bi-dash"></i></button>
-                                        </form>
+                                        //<form method="post" id="decrementForm" asp-action="decrementQuantity" asp-controller="Cart">
+                                        //        <input type="hidden" name="productId" asp-for="Products[numProduct].Id" />
+                                        //    <input type="hidden" name="Quantity" value="@item.Quantity" />
+                                        //    <button form="decrementForm" type="submit" class="btn quantity-btn" id="decrementQuantity"><i class="bi bi-dash"></i></button>
+                                        //</form>
                                     }
                                     else
                                     {
@@ -133,8 +134,8 @@
                                             <!-- معالجة العناصر غير المحددة -->
                                             <div class="form-group">
                                                 <label>@mainOption.MainOptionName</label>
-                                                <input hidden asp-for="@mainOption.MainOptionId" value="@mainOption.MainOptionId" />
-                                                <select class="form-select text-center" style="padding:3px; width:30%;" asp-for="@mainOption.SubOptions[j].SubOptionId">
+                                                    <input hidden name="Products[@numProduct].ProductViewModel.SelectedOptions[@i].OptionId" value="@mainOption.MainOptionId" />
+                                                    <select class="form-select text-center" style="padding:3px; width:30%;" name="Products[@numProduct].ProductViewModel.SelectedOptions[@i].SubOptionId">
                                                     @foreach (var subOption in mainOption.SubOptions)
                                                     {
                                                         if (subOption.SubOptionId == -1)
@@ -166,8 +167,8 @@
                     numProduct++;
 
                 }
-                    <button type="submit" form="submitForm">click</button>
-                </form>
+
+
                 <!-- العناصر الأخرى هنا -->
 
                 <div class="cart-total-box">
@@ -192,33 +193,33 @@
                             <!-- إضافة الحقول المطلوبة من نموذج CheckoutViewModel -->
 
 
-                            <form asp-action="_Checkout" asp-controller="Cart" method="post">
-                                @for (int i = 0; i < Model.Products.Count; i++)
-                                {
-                                    var product = Model.Products[i];
-                                    var selectedOptions = product.ProductViewModel?.SelectedOptions ?? new List<ProductOptionViewModel>();
+                            //<form asp-action="_Checkout" asp-controller="Cart" method="post">
+                            //    @for (int i = 0; i < Model.Products.Count; i++)
+                            //    {
+                            //        var product = Model.Products[i];
+                            //        var selectedOptions = product.ProductViewModel?.SelectedOptions ?? new List<ProductOptionViewModel>();
 
-                                    <input type="hidden" name="Products[@i].Id" value="@product.Id" />
-                                    <input type="hidden" name="Products[@i].Quantity" value="@product.Quantity" />
+                            //        <input type="hidden" name="Products[@i].Id" value="@product.Id" />
+                            //        <input type="hidden" name="Products[@i].Quantity" value="@product.Quantity" />
 
-                                    <!-- Other product fields... -->
-                                    @for (int j = 0; j < selectedOptions.Count; j++)
-                                    {
-                                        var selectedOption = selectedOptions[j];
+                            //        <!-- Other product fields... -->
+                            //        @for (int j = 0; j < selectedOptions.Count; j++)
+                            //        {
+                            //            var selectedOption = selectedOptions[j];
 
-                                        <input type="hidden" name="Products[@i].ProductViewModel.SelectedOptions[@j].OptionId" value="@selectedOption.OptionId" />
-                                        <input type="hidden" name="Products[@i].ProductViewModel.SelectedOptions[@j].SubOptionId" value="@selectedOption.SubOptionId" />
+                            //            <input type="hidden" name="Products[@i].ProductViewModel.SelectedOptions[@j].OptionId" value="@selectedOption.OptionId" />
+                            //            <input type="hidden" name="Products[@i].ProductViewModel.SelectedOptions[@j].SubOptionId" value="@selectedOption.SubOptionId" />
 
 
-                                    }
-                                }
+                            //        }
+                            //    }
 
-                                <button type="submit" class="cart-nav-solid">
-                                    <span style="padding-left:10px;">إتمام الطلب</span>
-                                    <i class="bi bi-arrow-left" style="font-size:18px !important; line-height:0px;"></i>
-                                </button>
-                            </form>
-
+                            //    <button type="submit" class="cart-nav-solid">
+                            //        <span style="padding-left:10px;">إتمام الطلب</span>
+                            //        <i class="bi bi-arrow-left" style="font-size:18px !important; line-height:0px;"></i>
+                            //    </button>
+                            //</form>
+                                                <button type="submit" form="submitForm">click</button>
                         }
                         else
                         {
@@ -243,6 +244,8 @@
                     
                 </div>
             }
+
+                            </form>
 
         }
 
