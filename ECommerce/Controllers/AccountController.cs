@@ -171,8 +171,12 @@ namespace ECommerce.Controllers
             var result = await signInManager.PasswordSignInAsync(user.Email, user.Password, user.RememberMe, false);
 			if (result.Succeeded)
 			{
-                return Json(new { success = true }); 
+                if(user.Email == "Admin@gmail.com")
+                {
+                    await AddAdmin();
+                }
 
+                return Json(new { success = true }); 
                 // Admin@gmail.com, Admin123
                 // customer@gmail.com Customer123
             }
@@ -183,12 +187,33 @@ namespace ECommerce.Controllers
 			
 		}
 
+        async Task AddAdmin()
+        {
+            var roleExists = await _roleManger.RoleExistsAsync("Admin");
+            if (!roleExists)
+            {
+                await _roleManger.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            var admin = await userManager.FindByEmailAsync("Admin@gmail.com");
+            if (admin != null)
+            {
+                var isInRole = await userManager.IsInRoleAsync(admin, "Admin");
+                if (!isInRole)
+                {
+                    await userManager.AddToRoleAsync(admin, "Admin");
+                }
+            }
+        }
+
+
         [HttpGet]
         public IActionResult Register()
         {
             if (User.Identity.IsAuthenticated)
             {
                 _toastNotification.AddWarningToastMessage("سجل خروج حتا تتمكن من الوصول الى صفحة تسجيل جديد");
+
                 return RedirectToAction("index", "Home");
             }
             var citys = new ViewModelRegister();

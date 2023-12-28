@@ -125,8 +125,8 @@
                                 </a>
                             }
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:black !important;">
-                                @if (!signInManager.IsSignedIn(User))
-                                {
+                            @if (!signInManager.IsSignedIn(User))
+                            {
                                     <a class="dropdown-item text-center dropdownCustom" role="button" onclick="showInPopup('@Url.Action("Login","Account",null, Context.Request.Scheme)','تسجيل دخول')">دخول</a>
                                 <a class="dropdown-item text-center dropdownCustom" role="button" asp-action="Register" asp-controller="Account">تسجيل</a>
 
@@ -142,7 +142,7 @@
                                     <form asp-action="Logout" asp-controller="Account" method="post">
                                         <button class="dropdown-item text-center dropdownCustom" type="submit">تسجيل خروج</button>
                                     </form>
-                                }
+                            }
                             </div>
                         </div>
                     </div>
