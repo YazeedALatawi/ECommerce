@@ -5,17 +5,14 @@ using ECommerce.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.DependencyInjection;
 using NToastNotify;
 
 namespace ECommerce.Controllers
 {
-	public class AccountController : Controller
-	{
-		private readonly UserManager<User> userManager;
-		private readonly SignInManager<User> signInManager;
+    public class AccountController : Controller
+    {
+        private readonly UserManager<User> userManager;
+        private readonly SignInManager<User> signInManager;
         private readonly IToastNotification _toastNotification;
         private readonly IOperations<User> _userOperation;
         private readonly IOperations<Product> _products;
@@ -24,9 +21,9 @@ namespace ECommerce.Controllers
         private readonly ShoppingCartService _shoppingCartService;
         private readonly RoleManager<IdentityRole> _roleManger;
         public AccountController(UserManager<User> userManager, RoleManager<IdentityRole> roleManger, SignInManager<User> signInManager, IToastNotification toastNotification, ShoppingCartService shoppingCartService, IOperations<Product> products, IOperations<Cart> cart, IOperations<CartProducts> cartProducts, IOperations<User> userOperation)
-		{
-			this.userManager = userManager;
-			this.signInManager = signInManager;
+        {
+            this.userManager = userManager;
+            this.signInManager = signInManager;
             _toastNotification = toastNotification;
             _userOperation = userOperation;
             _products = products;
@@ -60,7 +57,7 @@ namespace ECommerce.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("index","home");
+            return RedirectToAction("index", "home");
         }
 
 
@@ -73,7 +70,7 @@ namespace ECommerce.Controllers
                 {
                     var userID = userManager.GetUserId(User);
                     var user = await userManager.FindByIdAsync(userID);
-                    if(await userManager.IsInRoleAsync(user, "Admin"))
+                    if (await userManager.IsInRoleAsync(user, "Admin"))
                     {
                         _toastNotification.AddWarningToastMessage("لا يسمح بتغير بيانات هذا المستخدم");
                         return RedirectToAction("Index");
@@ -120,7 +117,7 @@ namespace ECommerce.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                if(ModelState.IsValid && model.RePassword == model.ConfirmPassword)
+                if (ModelState.IsValid && model.RePassword == model.ConfirmPassword)
                 {
                     var userID = userManager.GetUserId(User);
                     var user = await userManager.FindByIdAsync(userID);
@@ -153,7 +150,7 @@ namespace ECommerce.Controllers
             }
             else
             {
-                return RedirectToAction("index","home");
+                return RedirectToAction("index", "home");
             }
 
         }
@@ -162,30 +159,30 @@ namespace ECommerce.Controllers
         public IActionResult Login()
         {
             return View();
-		}
+        }
 
 
         [HttpPost]
-		public async Task<IActionResult> Login(ViewModelLogin user)
-		{
+        public async Task<IActionResult> Login(ViewModelLogin user)
+        {
             var result = await signInManager.PasswordSignInAsync(user.Email, user.Password, user.RememberMe, false);
-			if (result.Succeeded)
-			{
-                if(user.Email == "Admin@gmail.com")
+            if (result.Succeeded)
+            {
+                if (user.Email == "Admin@gmail.com")
                 {
                     await AddAdmin();
                 }
 
-                return Json(new { success = true }); 
+                return Json(new { success = true });
                 // Admin@gmail.com, Admin123
                 // customer@gmail.com Customer123
             }
             else
-			{
-				return Json(new { success = false });
-			}
-			
-		}
+            {
+                return Json(new { success = false });
+            }
+
+        }
 
         async Task AddAdmin()
         {
@@ -221,11 +218,11 @@ namespace ECommerce.Controllers
         }
 
 
-		[HttpPost]
-		public async Task<IActionResult> Register(ViewModelRegister user)
-		{
-			if (ModelState.IsValid)
-			{
+        [HttpPost]
+        public async Task<IActionResult> Register(ViewModelRegister user)
+        {
+            if (ModelState.IsValid)
+            {
                 var newuser = new User
                 {
                     UserName = user.Email,
@@ -261,7 +258,7 @@ namespace ECommerce.Controllers
                                 {
                                     userId = userManager.GetUserId(User)
                                 };
-             
+
                                 _carts.Add(newCart);
                                 var Thecart = _carts.findByIdUser(userManager.GetUserId(User));
                                 foreach (var item in productsSession.Products)
@@ -313,10 +310,10 @@ namespace ECommerce.Controllers
 
 
             }
-			
 
-			return View(user);
-		}
+
+            return View(user);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Logout()
@@ -367,5 +364,5 @@ namespace ECommerce.Controllers
             }
         }
 
-	}
+    }
 }
