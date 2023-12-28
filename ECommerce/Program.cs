@@ -1,10 +1,17 @@
+﻿
+using System.Security.Claims;
+using ECommerce;
 using ECommerce.Models;
 using ECommerce.Models.Repositories;
 using ECommerce.Models.Service;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NToastNotify;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +25,8 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 	ToastClass = "mt-5",
 });
 
+
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -27,13 +36,19 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddControllersWithViews();
-
+builder.WebHost.UseStaticWebAssets();
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
 });
+
+
+
+
+
+
 
 builder.Services.AddScoped<IOperations<Product>, ProductRepo>();
 builder.Services.AddScoped<IOperations<Category>, CategoryRepo>();
@@ -46,9 +61,22 @@ builder.Services.AddScoped<IOperations<productOptions>, productOptionsRepo>();
 builder.Services.AddScoped<IOperations<options>, optionRepo>();
 builder.Services.AddScoped<IOperations<CartPrdouctOptions>, CartPrdouctOptionsRepo>();
 builder.Services.AddTransient<ShoppingCartService>();
+builder.Services.AddTransient<LayoutServices>();
+
 
 
 builder.Services.AddIdentity<User, IdentityRole>(x => x.Password.RequireNonAlphanumeric = false).AddEntityFrameworkStores<ApplicationDBContext>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	// Cookie settings
+	options.Cookie.HttpOnly = true;
+	options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+
+	options.LoginPath = "/home/NoAuthenticated";
+	options.AccessDeniedPath = "/home/AccessDenied";
+	options.SlidingExpiration = true;
+});
 
 
 
@@ -57,10 +85,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-	app.UseExceptionHandler("/Home/Error");
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-	app.UseHsts();
+
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
+
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -75,25 +106,6 @@ app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
 
-//app.MapControllerRoute(
-//                name: "AdminProduct",
-//                pattern: "admin/product/{action}/{id?}",
-//                defaults: new { controller = "AdminProduct", action = "Index" });
-
-//app.MapControllerRoute(
-//                name: "AdminDashBoard",
-//                pattern: "admin/dashboard/{action}/{id?}",
-//                defaults: new { controller = "AdminDashboard", action = "Index" });
-
-//app.MapControllerRoute(
-//                name: "AdminCategory",
-//                pattern: "admin/category/{action}/{id?}",
-//                defaults: new { controller = "Category", action = "Index" });
-
-//app.MapControllerRoute(
-//                name: "AdminShipping",
-//                pattern: "admin/shipping/{action}/{id?}",
-//                defaults: new { controller = "ShippingCompanies", action = "Index" });
 
 app.MapControllerRoute(
 				name: "AdminArea",

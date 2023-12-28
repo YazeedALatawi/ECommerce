@@ -52,7 +52,12 @@ namespace ECommerce.Models.Repositories
 			return _db.ProductOptions.Include(x => x.Options).ToList();
 		}
 
-		public void update(productOptions entity)
+        public IList<productOptions> Search(string serach)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void update(productOptions entity)
 		{
 			_db.ProductOptions.Update(entity);
 			_db.SaveChanges();

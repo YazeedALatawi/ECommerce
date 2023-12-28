@@ -112,10 +112,8 @@ function isStrongPassword(password) {
         Swal.fire({
             title: 'تم تسجيلك بنجاح',
             text: '',
-            imageUrl: '/img/imghome/homeimg1.jpg',
-            imageWidth: 200,
-            imageHeight: 50,
-            imageAlt: 'Custom image',
+            icon: "success"
+
         })
 
         console.log('تم الاستدعاء');

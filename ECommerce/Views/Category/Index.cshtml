@@ -1,7 +1,9 @@
-﻿@model IEnumerable<ECommerce.Models.Category>
+﻿@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+@model IEnumerable<ECommerce.Models.Category>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "الفئات";
 }
 
 
@@ -40,12 +42,6 @@
                             <span class="fs-5 d-none d-sm-inline me-2">الطلبيات</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-white">
-                            <i class="fs-5 fa bi-person-fill-gear"></i>
-                            <span class="fs-5 d-none d-sm-inline me-2">الادراة</span>
-                        </a>
-                    </li>
                 </ul>
 
             </div>
@@ -54,12 +50,21 @@
         <!--Content-->
 
         <div>
-            <h1>الفئات</h1>
+            <h3>الفئات</h3>
+            <hr />
             <p>
                 <a asp-action="Create" class="btn btn-primary">فئه جديدة</a>
             </p>
-            <table class="table table-bordered">
-                <thead>
+
+            <form asp-action="index" method="get">
+                <div class="input-group input-group-sm mb-3 mt-4">
+                    <input type="text" class="form-control" name="search" required style="max-width:25%; border-radius:20px; font-size:16px;" aria-label="Sizing example input" placeholder="بحث" aria-describedby="inputGroup-sizing-md">
+                    <span><button class="btn me-1" type="submit" style="background-color:#1c1c1c; color:white;"><i class="bi bi-search"></i></button></span>
+                </div>
+            </form>
+
+            <table class="table table-striped">
+                <thead style="background-color:#1c1c1c; color:white;">
                     <tr>
                         <th>
                             @Html.DisplayName("الرقم")
@@ -95,6 +100,20 @@
                 </tbody>
             </table>
 
+            @{
+                int pageValue = Convert.ToInt32(Context.Request.Query["page"]);
+                string Search = Context.Request.Query["search"].ToString();
+                if (Search != null)
+                {
+                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("index", new {page = page, search = Search}), new X.PagedList.Web.Common.PagedListRenderOptions{DisplayItemSliceAndTotal=false, ContainerDivClasses = new [] {"navigation"}, LiElementClasses= new [] {"page-item"}, PageClasses= new [] {"page-link"}})
+                }
+                else if (pageValue > 1 || Model.Count() >= 10)
+                {
+                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("index", new {page = page}), new X.PagedList.Web.Common.PagedListRenderOptions{DisplayItemSliceAndTotal=false, ContainerDivClasses = new [] {"navigation"}, LiElementClasses= new [] {"page-item"}, PageClasses= new [] {"page-link"}})
+                }
+            }
+
+
         </div>
 
 
@@ -118,19 +137,19 @@
                 confirmButtonText: 'نعم, احذف المنتج'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    var idToDelete = id; // استبدل 123 بالقيمة التي تريد حذفها
+                    var idToDelete = id; 
 
                     $.ajax({
                         url: '/admin/category/Delete',
                         method: 'POST',
                         data: { id: idToDelete },
                         success: function (data) {
-                            // إذا كنت ترغب في معالجة الاستجابة هنا
+
                             console.log('تم حذف المنتج');
-                            window.location.href = '/admin/category/Index'; // قم بتوجيه المستخدم إلى الصفحة المطلوبة بعد الحذف
+                            window.location.href = '/admin/category/Index';
                         },
                         error: function (error) {
-                            // يمكنك التعامل مع الأخطاء هنا
+
                             console.error('حدث خطأ أثناء حذف المنتج');
                         }
                     });

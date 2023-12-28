@@ -1,0 +1,224 @@
+﻿@using ECommerce.ViewModel;
+@model UserViewModel
+
+@{
+    ViewData["Title"] = "معلومات الحساب";
+}
+<div class=" mt-5" style="box-shadow: 0px 9px 44px 33px rgba(0,0,0,0.1); padding:40px; border-radius:20px;">
+    <form method="post" asp-action="update">
+    <div class="row">
+        <div class="col">
+            <p class="badge bg-dark" id="inputGroup-sizing-md">الاسم الاول</p>
+                <div><span asp-validation-for="FirstName" class="text-danger"></span></div>
+            <div class="input-group input-group-md mb-3">
+                <input type="text" class="form-control" id="FirstNameField" asp-for="FirstName" aria-label="Small" disabled aria-describedby="inputGroup-sizing-md">
+            </div>
+        </div>
+        <div class="col">
+            <p class="badge bg-dark" id="inputGroup-sizing-md">الاسم الاخير</p>
+            <div><span asp-validation-for="LastName" class="text-danger"></span></div>
+            <div class="input-group input-group-md mb-3">
+                <input type="text" class="form-control" id="LastNameField" asp-for="LastName" aria-label="Small" disabled aria-describedby="inputGroup-sizing-md">
+            </div>
+        </div>
+    </div>
+
+
+
+    <p class="badge bg-dark" id="inputGroup-sizing-md">رقم الهاتف</p>
+    <div><span asp-validation-for="PhoneNumber" class="text-danger"></span></div>
+    <div class="input-group input-group-md mb-3">
+        <input type="text" class="form-control" id="phoneField" dir="ltr" asp-for="PhoneNumber" aria-label="Small" disabled aria-describedby="inputGroup-sizing-md">
+    </div>
+
+    <p class="badge bg-dark" id="inputGroup-sizing-md">الايميل</p>
+        <div><span asp-validation-for="Email" class="text-danger"></span></div>
+    <div class="input-group input-group-md mb-3">
+        <input type="text" class="form-control" id="emailField" dir="ltr" asp-for="Email" aria-label="Small" disabled aria-describedby="inputGroup-sizing-md">
+    </div>
+
+    
+    <div class="row">
+        <div class="col">
+            <p class="badge bg-dark" id="inputGroup-sizing-md">المدينة</p>
+                <div><span asp-validation-for="City" class="text-danger"></span></div>
+            <div class="input-group input-group-md mb-3">
+                <select type="text" class="form-select" id="cityField" asp-for="City" aria-label="Small" disabled aria-describedby="inputGroup-sizing-md">
+                    @foreach(var item in Model.AvailableCities)
+                    {
+                        if(item == Model.City)
+                        {
+                            <option selected value="@item">@item</option>
+                        }
+                        else
+                        {
+                            <option value="@item">@item</option>
+                        }
+
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col">
+            <p class="badge bg-dark" id="inputGroup-sizing-md">الحي</p>
+                <div><span asp-validation-for="District" class="text-danger"></span></div>
+            <div class="input-group input-group-md mb-3">
+                <input type="text" class="form-control" id="disField" asp-for="District" aria-label="Small" disabled aria-describedby="inputGroup-sizing-md">
+            </div>
+        </div>
+        <div class="col">
+                <p class="badge bg-dark" id="inputGroup-sizing-md">الشارع</p>
+                <div><span asp-validation-for="Street" class="text-danger"></span></div>
+            <div class="input-group input-group-md mb-3">
+                <input type="text" class="form-control" id="streetField" asp-for="Street" aria-label="Small" disabled aria-describedby="inputGroup-sizing-md">
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div>
+        <button type="button" class="btn btn-outline-danger" id="editButton">تعديل</button>
+    </div>
+
+        <input hidden asp-for="id" />
+        <input hidden asp-for="ConfirmPassword" value="ExamplePass999" />
+        <input hidden asp-for="Password" value="ExamplePass999" />
+        <input hidden asp-for="RePassword" value="ExamplePass999" />
+
+    <div class="d-none mt-4">
+        <button type="submit" class="btn w-100 text-white" style="background-color:#dfb600;" id="saveButton">حفظ</button>
+    </div>
+    </form>
+
+    <div>
+        <button class="btn btn-outline-warning mt-5" id="changePasswordButton">تغير كلمة السر</button>
+    </div>
+    <div id="RePasswordForm" class="d-none mt-3">
+        <form asp-action="changePassword" method="post">
+            <p class="badge bg-dark" id="inputGroup-sizing-md">كلمة السر الحالية</p>
+            <div><span asp-validation-for="Password" class="text-danger"></span></div>
+            <div class="input-group input-group-sm mb-3">
+                <input type="password" asp-for="Password" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-md">
+            </div>
+            <p class="badge bg-dark" id="inputGroup-sizing-md">كلمة السر الجديدة</p>
+            <div><span asp-validation-for="RePassword" class="text-danger"></span></div>
+            <div class="input-group input-group-md mb-3">
+                <input type="password" class="form-control" asp-for="RePassword" aria-label="Small" aria-describedby="inputGroup-sizing-md">
+            </div>
+
+            <p class="badge bg-dark" id="inputGroup-sizing-md">اعادة كلمة السر</p>
+            <div><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div>
+            <div class="input-group input-group-md mb-3">
+                <input type="password" class="form-control" asp-for="ConfirmPassword" aria-label="Small" aria-describedby="inputGroup-sizing-md">
+            </div>
+
+            <input hidden asp-for="id" />
+            <input hidden asp-for="FirstName" />
+            <input hidden asp-for="LastName" />
+            <input hidden asp-for="City"  />
+            <input hidden asp-for="PhoneNumber"  />
+            <input hidden asp-for="Email"  />
+            <input hidden asp-for="Street"  />
+            <input hidden asp-for="District"  />
+            
+
+            <button type="submit" class="btn w-100 text-white" style="background-color:#dfb600;" id="saveButton">حفظ</button>
+        </form>
+    </div>
+
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById("container").classList.remove('me-0');
+        document.getElementById("container").classList.remove('pe-0');
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+            $("#editButton").click(function () {
+
+                var changePasswordButtonText = $("#changePasswordButton").text();
+                if (changePasswordButtonText === "الغاء") {
+                    $("#RePasswordForm").addClass("d-none");
+
+                    $("#changePasswordButton").text("تغير كلمة السر");
+                }
+
+                toggleField("FirstNameField");
+                toggleField("LastNameField");
+                toggleField("phoneField");
+                toggleField("emailField");
+                toggleField("cityField");
+                toggleField("disField");
+                toggleField("streetField");
+
+                $("#saveButton").parent().toggleClass("d-none");
+
+
+                var buttonText = $(this).text();
+                $(this).text(buttonText === "تعديل" ? "إلغاء" : "تعديل");
+
+
+                
+
+            });
+
+            function toggleField(fieldId) {
+                $("#" + fieldId).prop("disabled", function (i, val) {
+                    return !val;
+                });
+            }
+        });
+    </script>
+
+
+
+    <script>
+        $(document).ready(function () {
+
+            $("#changePasswordButton").click(function () {
+                var changePasswordButtonText = $("#changePasswordButton").text();
+
+
+                if (changePasswordButtonText === "تغير كلمة السر") {
+
+                    $("#RePasswordForm").removeClass("d-none");
+
+
+                    if (!$("#FirstNameField").prop("disabled")) {
+                        toggleFields(["FirstNameField", "LastNameField", "phoneField", "emailField", "cityField", "disField", "streetField"]);
+
+                        $("#saveButton").parent().addClass("d-none");
+
+                        var editButtonText = $("#editButton").text();
+                        $("#editButton").text(editButtonText === "تعديل" ? "إلغاء" : "تعديل");
+                    }
+                } else if (changePasswordButtonText === "الغاء") {
+
+                    $("#RePasswordForm").addClass("d-none");
+                    toggleFields(["currentPasswordField", "newPasswordField", "confirmNewPasswordField"]);
+                }
+
+
+                $("#changePasswordButton").text(changePasswordButtonText === "تغير كلمة السر" ? "الغاء" : "تغير كلمة السر");
+            });
+
+
+            function toggleFields(fieldIds) {
+                fieldIds.forEach(function (fieldId) {
+                    $("#" + fieldId).prop("disabled", function (i, val) {
+                        return !val;
+                    });
+                });
+            }
+        });
+    </script>
+
+
+
+}

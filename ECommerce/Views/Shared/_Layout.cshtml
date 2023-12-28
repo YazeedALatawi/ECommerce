@@ -4,6 +4,7 @@
 @inject SignInManager<User> signInManager;
 @inject UserManager<User> userManager;
 @inject ShoppingCartService shoppingCartService
+@inject LayoutServices layoutServices
 
 
 
@@ -18,8 +19,9 @@
     <link rel="stylesheet" href="~/ECommerce.styles.css" asp-append-version="true" />
 	<link href="~/lib/bootstrap/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
 	<link href="~/lib/bootstrap/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet" />
-
-    <!-- تضمين مكتبة SweetAlerts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&family=Markazi+Text:wght@500&display=swap" rel="stylesheet">
 
     <style>
         .dropdownCustom{
@@ -39,58 +41,74 @@
             color:yellow;
         }
 
+
+
     </style>
 </head>
 <body dir="rtl">
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-black mb-0 p-0" style="background-color:black !important;">
+        <nav class="navbar navbar-expand-md navbar-dark bg-black mb-0 p-0" style="background-color:black !important;">
             <div class="container-fluid">
-                <a class="navbar-brand m-1" asp-area="" asp-controller="Home" asp-action="Index"><img class="img-fluid" style="max-width: 150px; height: auto;" src="~/img/imghome/homeimg1.jpg" /></a>
+                <a class="navbar-brand m-1" asp-area="" asp-controller="Home" asp-action="Index"><img class="img-fluid" style="max-width: 150px; height: auto;" src="~/img/imghome/imgaz.jpg" /></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link text-black mx-3 fw-bold" style="background-color:#ffff2d" asp-area="" asp-controller="Home" asp-action="Index">الصفحة الرئيسية</a>
+                            <a class="nav-link text-black mx-3 fw-bold" style="background-color:#ffff2d; border-radius:7px;" asp-area="" asp-controller="Home" asp-action="Index">الصفحة الرئيسية</a>
                         </li>
                         <li class="nav-item">
                             <div class="dropdown">
                                 <a class="nav-link text-white mx-3 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     الاصناف
                                 </a>
-
+                                @{
+                                    var categoies = layoutServices.getCategory();
+                                }
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:black !important;">
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">الكل</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">الأقمشة</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">البساطير والجزم</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">الانوطه و الونقات</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">الاكسسوارات</a>
+                                    <a class="dropdown-item text-center dropdownCustom" asp-action="index" asp-controller="home">الكل</a>
+
+                                    @foreach(var item in categoies)
+                                    {
+                                        <a asp-action="index" asp-controller="home" asp-route-category="@item.Name" class="dropdown-item text-center dropdownCustom">@item.Name</a>
+                                    }
                                 </div>
                             </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white mx-1" asp-area="" asp-controller="Home" asp-action="Privacy">الخصوصية</a>
                         </li>
                     </ul>
 
 
 
 
-
+                                    </div>
 
 
                     <div class="d-flex align-items-center">
-                        <a asp-action="index" asp-controller="Cart"><i class="bi bi-cart-check-fill icon-custom"></i></a>
+                        <a asp-action="index" asp-controller="Cart" class="d-inline position-relative"><i class="bi bi-cart-check-fill icon-custom">
                         @{
                             int count = shoppingCartService.GetCartItemCount();
-                            if(count > 0)
+                            if(count > 0 && !User.Identity.IsAuthenticated)
                             {
-                                 <span id="cart-item-count" class="text-white">@count</span>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="transform:translate(-70%,7%)!important; padding:3px 7px; font-size:12px;">
+                                    @count
+                                    <span class="visually-hidden">unread messages</span>
+                                </span>
                             }
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            int _count = layoutServices.getCountProductInCart();
+                            if(_count > 0)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="transform:translate(-70%,7%)!important; padding:3px 7px; font-size:12px;">
+                                    @_count
+                                    <span class="visually-hidden">unread messages</span>
+                                </span>
+                            }
+                        }                            
 
                         }
-
+                        </i></a>
 
                         <div class="dropdown show ms-5">
                             @if (signInManager.IsSignedIn(User))
@@ -110,13 +128,17 @@
                                 @if (!signInManager.IsSignedIn(User))
                                 {
                                     <a class="dropdown-item text-center dropdownCustom" role="button" onclick="showInPopup('@Url.Action("Login","Account",null, Context.Request.Scheme)','تسجيل دخول')">دخول</a>
-                                    <a class="dropdown-item text-center dropdownCustom" role="button" asp-action="Register" asp-controller="Account">تسجيل</a>
+                                <a class="dropdown-item text-center dropdownCustom" role="button" asp-action="Register" asp-controller="Account">تسجيل</a>
+
+                            }
+                            else
+                            {
+                                if (signInManager.Context.User.IsInRole("Admin"))
+                                {
                                     <a class="dropdown-item text-center dropdownCustom" role="button" asp-action="index" asp-controller="AdminDashboard">لوحة التحكم</a>
                                 }
-                                else
-                                {
                                     <a class="dropdown-item text-center dropdownCustom" asp-action="index" asp-controller="Order">طلباتي</a>
-                                    <a class="dropdown-item text-center dropdownCustom" href="#">بياناتي</a>
+                                    <a class="dropdown-item text-center dropdownCustom" asp-action="index" asp-controller="account">بياناتي</a>
                                     <form asp-action="Logout" asp-controller="Account" method="post">
                                         <button class="dropdown-item text-center dropdownCustom" type="submit">تسجيل خروج</button>
                                     </form>
@@ -126,7 +148,7 @@
                     </div>
 
 
-                </div>
+
             </div>
         </nav>
 
@@ -136,7 +158,7 @@
 
 
     <div class="container me-0 pe-0" id="container">
-        <main role="main" class="pb-2">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
@@ -174,14 +196,14 @@
         </div>
     </div>
 
-    <!-- Modal Login End -->
+
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2023 - ECommerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">الخصوصية</a>
+            &copy; 2023 - متجر الكتروني - <a href="https://www.linkedin.com/in/yazeed-alatawi-222876265/" target="_blank" style="text-decoration:none; font-size:15px; font-weight:700;">يزيد العطوي <i class="bi bi-linkedin"></i></a>
         </div>
     </footer>
-    <!-- تضمين مكتبة SweetAlerts -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -2,10 +2,14 @@
 using ECommerce.Models;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
+using X.PagedList;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace ECommerce.Controllers
 {
     [Route("admin/shipping/[action]/{id?}")]
+    [Authorize(Roles = "Admin")]
 
     public class ShippingCompaniesController : Controller
     {
@@ -17,9 +21,31 @@ namespace ECommerce.Controllers
             this.shipping = shipping;
             this.toastNotification = toastNotification;
         }
-        public IActionResult Index()
+
+        IPagedList<Shipping> Search(string search, int? page)
         {
-            var model = shipping.List().ToList();
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return null;
+            }
+            else
+            {
+                var res = shipping.Search(search).ToPagedList(page ?? 1, 10);
+                return res;
+            }
+
+        }
+        public IActionResult Index(int ? page, string search)
+        {
+            if (search != null)
+            {
+                var listSort = Search(search, page);
+                if (listSort != null)
+                {
+                    return View(listSort);
+                }
+            }
+            var model = shipping.List().ToList().ToPagedList(page ?? 1, 10);
             return View(model);
         }
 

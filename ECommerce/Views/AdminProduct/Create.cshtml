@@ -9,7 +9,7 @@
 
 <h4>المنتجات</h4>
 <hr />
-<form asp-action="Create" method="post" enctype="multipart/form-data">
+<form asp-action="Create" method="post" enctype="multipart/form-data" style="box-shadow:0px 9px 44px 33px rgba(0,0,0,0.1); border-radius:25px; padding:30px;">
 
     <div class="row">
 
@@ -70,7 +70,7 @@
                 <img id="img" alt="" src="" style="width:250px; height:250px;"/>
             </div>
             <div class="form-group mt-3">
-                <input type="submit" value="اضافة" onclick="confirm('هل انت متاكد؟')" class="btn btn-primary" />
+                <input type="submit" value="اضافة" onclick="confirm('هل انت متاكد؟')" class="btn w-100 text-white" style="background-color:#dfb600;" />
             </div>
             <div class="form-group mt-2">
                 <a asp-action="Index">الرجوع</a>

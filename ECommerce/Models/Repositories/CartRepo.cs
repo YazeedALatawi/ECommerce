@@ -45,6 +45,7 @@ namespace ECommerce.Models.Repositories
 			return cart;
 		}
 
+
         public IList<Cart> findAllByCartId(int id)
         {
             throw new NotImplementedException();
@@ -56,6 +57,11 @@ namespace ECommerce.Models.Repositories
         }
 
         public bool findByIdProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Cart> Search(string serach)
         {
             throw new NotImplementedException();
         }

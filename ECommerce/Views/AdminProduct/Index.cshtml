@@ -1,8 +1,11 @@
-﻿@model IEnumerable<ECommerce.Models.Product>
+﻿@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+@model IEnumerable<ECommerce.Models.Product>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "المنتجات";
 }
+
 
 
 <div class="container-fluid">
@@ -40,44 +43,49 @@
                             <span class="fs-5 d-none d-sm-inline me-2">الطلبيات</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-white">
-                            <i class="fs-5 fa bi-person-fill-gear"></i>
-                            <span class="fs-5 d-none d-sm-inline me-2">الادراة</span>
-                        </a>
-                    </li>
                 </ul>
 
             </div>
         </div>
 
-        <!--Content-->
+
 
         <div>
-            <h1>المنتجات</h1>
+            <h3>المنتجات</h3>
+            <hr />
             <p>
                 <a asp-action="Create" class="btn btn-primary">منتج جديد</a>
             </p>
-                <table class="table table-bordered table-light">
-                    <thead>
+
+            <form asp-action="index" method="get">
+                <div class="input-group input-group-sm mb-3 mt-4">
+                    <input type="text" class="form-control" name="search" required style="max-width:25%; border-radius:20px; font-size:16px;" aria-label="Sizing example input" placeholder="بحث" aria-describedby="inputGroup-sizing-md">
+                    <span><button class="btn me-1" type="submit" style="background-color:#1c1c1c; color:white;"><i class="bi bi-search"></i></button></span>
+                </div>
+            </form>
+
+
+
+
+                <table class="table table-striped">
+                <thead style="background-color:#1c1c1c; color:white;">
                         <tr>
-                            <th>
-                                @Html.DisplayName("الاسم")
+                        <th>
+                        </th>
+                            <th class="">
+                            @Html.DisplayName("الاسم")<span><a style="display:contents;" asp-action="index" asp-route-colName="name"><button class="btn p-0" style="background-color:#1c1c1c;"><i class="bi bi-arrow-down-short text-white"></i></button></a></span>
                             </th>
-                            <th>
-                                @Html.DisplayName("الفئة")
+                        <th class="">
+                            @Html.DisplayName("الفئة")<span><a style="display:contents;" asp-action="index" asp-route-colName="cate"><button class="btn p-0" style="background-color:#1c1c1c;"><i class="bi bi-arrow-down-short text-white"></i></button></a></span>
                             </th>
-                            <th>
-                                @Html.DisplayName("الكمية")
+                        <th class="">
+                            @Html.DisplayName("الكمية")<span><a style="display:contents;" asp-action="index" asp-route-colName="count"><button class="btn p-0" style="background-color:#1c1c1c;"><i class="bi bi-arrow-down-short text-white"></i></button></a></span>
                             </th>
-                            <th>
-                                @Html.DisplayName("الخصم")
+                        <th class="">
+                            @Html.DisplayName("الخصم")<span><a style="display:contents;" asp-action="index" asp-route-colName="dis"><button class="btn p-0" style="background-color:#1c1c1c;"><i class="bi bi-arrow-down-short text-white"></i></button></a></span>
                             </th>
-                            <th>
-                                @Html.DisplayName("السعر")
-                            </th>
-                            <th>
-                                @Html.DisplayName("الصناعة")
+                        <th class="">
+                            @Html.DisplayName("السعر")<span><a style="display:contents;" asp-action="index" asp-route-colName="pri"><button class="btn p-0" style="background-color:#1c1c1c;"><i class="bi bi-arrow-down-short text-white"></i></button></a></span>
                             </th>
                             <th></th>
                         </tr>
@@ -86,6 +94,9 @@
                         @foreach (var item in Model)
                         {
                                 <tr>
+                                    <td class="text-center" style="width:100px;">
+                                        <img src="~/@item.Image" class="rounded img-fluid" width="100px"/>
+                                    </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Name)
                                     </td>
@@ -93,16 +104,24 @@
                                         @Html.DisplayFor(modelItem => item.category.Name)
                                     </td>
                                     <td>
+                                    @if(item.Count <= 0 && item.ProductViewModel.ExistingOptions.Count <= 0)
+                                    {
+                                        <p class="text-danger">نفذت الكمية</p>
+                                    }
+                                    else if(item.ProductViewModel.ExistingOptions.Count <= 0)
+                                    {
                                         @Html.DisplayFor(modelItem => item.Count)
-                                    </td>
+                                    }
+                                    else
+                                    {
+                                        <p class="">المنتج له خيارات</p>
+                                    }
+                                </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Discount)
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Price)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.MadeIn)
                                     </td>
                                     <td class="text-center">
 
@@ -122,7 +141,29 @@
                         }
                     </tbody>
                 </table>
+
+            @{
+                int pageValue = Convert.ToInt32(Context.Request.Query["page"]);
+                string tempData = Context.Request.Query["colName"].ToString();
+                string Search = Context.Request.Query["search"].ToString();
+                if(Search != null)
+                {
+                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("index", new {page = page, search = Search}), new X.PagedList.Web.Common.PagedListRenderOptions{DisplayItemSliceAndTotal=false, ContainerDivClasses = new [] {"navigation"}, LiElementClasses= new [] {"page-item"}, PageClasses= new [] {"page-link"}})
+                }
+                else if(tempData != null)
+                {
+                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("index", new {page = page, colName = tempData}), new X.PagedList.Web.Common.PagedListRenderOptions{DisplayItemSliceAndTotal=false, ContainerDivClasses = new [] {"navigation"}, LiElementClasses= new [] {"page-item"}, PageClasses= new [] {"page-link"}})
+
+                }
+                else if (pageValue > 1 || Model.Count() >= 8)
+                {
+                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("index", new {page = page}), new X.PagedList.Web.Common.PagedListRenderOptions{DisplayItemSliceAndTotal=false, ContainerDivClasses = new [] {"navigation"}, LiElementClasses= new [] {"page-item"}, PageClasses= new [] {"page-link"}})
+                }
+            }
+
+
         </div>
+
 
 
 
@@ -130,6 +171,12 @@
 </div>
 
 @section Scripts{
+
+    <script>
+        $(document).ready(function() {
+            $('ul.pagination > li.disabled > a').addClass('page-link');
+        });
+    </script>
 
     <script>
         function confirmAlert(e, id) {
@@ -145,25 +192,27 @@
                 confirmButtonText: 'نعم, احذف المنتج'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    var idToDelete = id; // استبدل 123 بالقيمة التي تريد حذفها
+                    var idToDelete = id; 
 
                     $.ajax({
                         url: '@Url.Action("Delete", "AdminProduct")',
                         method: 'POST',
                         data: { id: idToDelete },
                         success: function (data) {
-                            // إذا كنت ترغب في معالجة الاستجابة هنا
+
                             console.log('تم حذف المنتج');
-                            window.location.href = '@Url.Action("Index", "AdminProduct")'; // قم بتوجيه المستخدم إلى الصفحة المطلوبة بعد الحذف
+                            window.location.href = '@Url.Action("Index", "AdminProduct")'; 
                         },
                         error: function (error) {
-                            // يمكنك التعامل مع الأخطاء هنا
                             console.error('حدث خطأ أثناء حذف المنتج');
                         }
                     });
                 }
             })
         }
+
+
+
     </script>
 
 }

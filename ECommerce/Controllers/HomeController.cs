@@ -1,10 +1,13 @@
 ﻿using ECommerce.Models;
 using ECommerce.Models.Repositories;
 using ECommerce.Models.Service;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using NToastNotify;
 using System.Diagnostics;
+using X.PagedList;
 
 namespace ECommerce.Controllers
 {
@@ -17,7 +20,8 @@ namespace ECommerce.Controllers
         private readonly IOperations<Cart> _cart;
         private readonly UserManager<User> _userManager;
         private readonly IOperations<CartProducts> _cartProducts;
-        public HomeController(ILogger<HomeController> logger, IToastNotification toastNotification, IOperations<Product> product, ShoppingCartService shoppingCartService, IOperations<Cart> carts, UserManager<User> userManager, IOperations<CartProducts> cartProducts)
+        private readonly IDataProtector _dataProtector;
+        public HomeController(ILogger<HomeController> logger, IToastNotification toastNotification, IOperations<Product> product, ShoppingCartService shoppingCartService, IOperations<Cart> carts, UserManager<User> userManager, IOperations<CartProducts> cartProducts, IDataProtectionProvider dataProtectionProvider)
 		{
 			_logger = logger;
 			_ToastNotification = toastNotification;
@@ -25,22 +29,68 @@ namespace ECommerce.Controllers
 			_shoppingCartService= shoppingCartService;
             _cart = carts;
             _userManager= userManager;
-            _cartProducts= cartProducts;
-
+            _cartProducts = cartProducts;
+            _dataProtector = dataProtectionProvider.CreateProtector("ECommerce");
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
-        public IActionResult Index()
+
+        public IActionResult NoAuthenticated(string? ReturnUrl)
+        {
+            if (ReturnUrl != null)
+            {
+                _ToastNotification.AddErrorToastMessage("يجب عليك تسجيل الدخول");
+                return RedirectToAction("index");
+            }
+
+            return RedirectToAction("index");
+
+        }
+        public IActionResult AccessDenied(string? ReturnUrl)
+        {
+            if(ReturnUrl != null)
+            {
+                return RedirectToAction("AccessDenied");
+            }
+
+            return View();
+
+        }
+        public IActionResult Index(int? page, string? category, string? search, string? ReturnUrl)
 		{
-			var products = _products.List().ToList();
-            ChecktheSession();
-            return View(products);
+
+            if (!search.IsNullOrEmpty() && category.IsNullOrEmpty())
+            {
+                var products = _products.Search(search).ToPagedList(page ?? 1, 20);
+                ViewData["search"] = search;
+                products.ToList().ForEach(a => a.key = _dataProtector.Protect(a.Id.ToString()));
+                return View(products);
+            }
+            else if (!category.IsNullOrEmpty() && search.IsNullOrEmpty())
+            {
+                var products = _products.List().Where(a => a.category.Name == category).ToList().ToPagedList(page ?? 1, 20);
+                ChecktheSession();
+                products.ToList().ForEach(a => a.key = _dataProtector.Protect(a.Id.ToString()));
+                return View(products);
+            }
+            else if (!search.IsNullOrEmpty() && !category.IsNullOrEmpty())
+            {
+                var listCate = _products.List().Where(a => a.category.Name == category);
+                var res = listCate.Where(a => a.Name.Contains(search) || a.category.Name.Contains(search)).ToPagedList(page ?? 1, 20);
+                ViewData["search"] = search;
+                res.ToList().ForEach(a => a.key = _dataProtector.Protect(a.Id.ToString()));
+                return View(res);
+            }
+            else
+            {
+                var products = _products.List().ToList().ToPagedList(page ?? 1, 20);
+                ChecktheSession();
+                products.ToList().ForEach(a => a.key = _dataProtector.Protect(a.Id.ToString()));
+                return View(products);
+            }
 		}
 
-		public IActionResult Privacy()
-		{
-			return View();
-		}
+
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
@@ -111,6 +161,7 @@ namespace ECommerce.Controllers
 
 
          }
+
 
     }
 }

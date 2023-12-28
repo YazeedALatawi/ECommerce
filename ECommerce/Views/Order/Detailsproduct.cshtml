@@ -1,13 +1,18 @@
 ﻿@model IEnumerable<ECommerce.Models.CartProducts>
+@using Microsoft.EntityFrameworkCore;
 
     <style>
         body{
-            background-color:#555;
+            background-color:#fff;
         }
     </style>
+
+    @{
+    ViewData["Title"] = "تفاصيل الطلب";
+}
 <div class="container w-75">
-<table class="table table-responsive-sm table-dark table-hover mt-5">
-    <thead>
+<table class="table table-striped mt-5">
+    <thead style="background-color:#1c1c1c; color:white;">
         <tr>
             <th scope="col">
                 
@@ -21,6 +26,9 @@
             <th>
                 @Html.DisplayName("اجمالي السعر")
             </th>
+            <th>
+                @Html.DisplayName("الخيارات")
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -29,7 +37,7 @@
         <tr>
 
             <td>
-                            <a asp-action="Details" asp-controller="Products" asp-route-Id="@item.productId">
+                            <a asp-action="Details" asp-controller="Products" asp-route-Id="@item.key">
                 <img src="~/@item.product.Image" class="img-thumbnail" width="150px" height="150px">
                             </a>
             </td>
@@ -42,6 +50,12 @@
             <td>
                 @{var totalPrice = item.count * item.product.Price;}
                 <p>@totalPrice</p>
+            </td>
+            <td>
+                @foreach(var option in item.options)
+                {
+                    <p>@option.MainOptionName:  @option.SubOptionName</p>
+                }
             </td>
 
         </tr>

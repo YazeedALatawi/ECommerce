@@ -52,7 +52,12 @@
 			return db.Comments.ToList();
 		}
 
-		public void update(Comment entity)
+        public IList<Comment> Search(string serach)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void update(Comment entity)
 		{
 			db.Update(entity);
 			db.SaveChanges();

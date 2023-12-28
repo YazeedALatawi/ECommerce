@@ -45,6 +45,11 @@
 
         public IList<User> List()
         {
+            return _db.Users.ToList();
+        }
+
+        public IList<User> Search(string serach)
+        {
             throw new NotImplementedException();
         }
 

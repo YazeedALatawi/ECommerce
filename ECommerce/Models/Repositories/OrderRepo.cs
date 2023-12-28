@@ -52,7 +52,13 @@
 			return db.Orders.ToList();
 		}
 
-		public void update(Order entity)
+        public IList<Order> Search(string serach)
+        {
+			var res = db.Orders.Where(a => a.Id.ToString().Contains(serach) || a.orderState.Contains(serach) || a.totalPrice.ToString().Contains(serach)).ToList();
+			return res;
+        }
+
+        public void update(Order entity)
 		{
 			db.Orders.Update(entity);
 			db.SaveChanges();

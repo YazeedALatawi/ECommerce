@@ -55,7 +55,13 @@ namespace ECommerce.Models.Repositories
 			return db.Products.Include(x=> x.category).ToList();
 		}
 
-		public void update(Product entity)
+        public IList<Product> Search(string serach)
+        {
+			var res = db.Products.Include(a => a.category).Where(a => a.Id.ToString().Contains(serach) || a.Name.Contains(serach) || a.Price.ToString().Contains(serach) || a.Count.ToString().Contains(serach) || a.category.Name.Contains(serach)).ToList();
+			return res;
+        }
+
+        public void update(Product entity)
 		{
 			db.Products.Update(entity);
 			db.SaveChanges();

@@ -60,7 +60,12 @@
 			return db.FinalCarts.ToList();
 		}
 
-		public void update(CartProducts entity)
+        public IList<CartProducts> Search(string serach)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void update(CartProducts entity)
 		{
 			db.FinalCarts.Update(entity);
 			db.SaveChanges();

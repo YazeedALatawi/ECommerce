@@ -1,9 +1,14 @@
 ﻿@model ECommerce.ViewModel.ViewModelRegister
 
-<form style="max-width:750px; margin:100px auto; background-color:aliceblue; box-shadow:rgba(21, 24, 25, 0.1) 0px 2px 10px 0px!important;" class="text-center border border-2 rounded p-5" asp-controller="Account" asp-action="Register" method="post">
+
+@{
+    ViewData["Title"] = "تسجيل جديد";
+}
+
+<form style="max-width:750px; margin:100px auto; background-color:#f5f5f5; box-shadow:rgba(21, 24, 25, 0.1) 0px 2px 10px 0px!important;" class="text-center border border-2 rounded p-5" asp-controller="Account" asp-action="Register" method="post">
 
     <p class="h4 mb-4">تسجيل جديد</p>
-    <!-- 2 column grid layout with text inputs for the first and last names -->
+
     <div class="row mb-4">
         <div class="col">
             <div class="form-outline">
@@ -19,31 +24,31 @@
         </div>
     </div>
 
-    <!-- Email input -->
+
     <div class="form-outline mb-4">
         <input type="email" id="form3Example3" class="form-control" asp-for="Email" placeholder="الايميل" autocomplete="off" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
-    <!-- PhoneNumber input -->
+
     <div class="form-outline mb-4">
         <input id="form3Example3" class="form-control" asp-for="PhoneNumber" placeholder="رقم الهاتف : 056XXXXXXX" autocomplete="off" />
         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
     </div>
 
-    <!-- Password input -->
+
     <div class="form-outline mb-4">
         <input type="password" id="form3Example4" class="form-control" asp-for="Password" placeholder="كلمة السر" autocomplete="off">
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
-        <!-- Password input -->
+
     <div class="form-outline mb-4">
         <input type="password" id="form3Example4" class="form-control" asp-for="ConfirmPassword" placeholder="اعادة كلمة السر" autocomplete="off" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
 
-    <!-- Address inputs -->
+
     <div class="row mb-4">
         <div class="col">
             <div class="form-outline">
@@ -54,8 +59,8 @@
                         <option value="@city">@city</option>
                     }
                 </select>
-@*                <input type="text" id="form3Example4" class="form-control" asp-for="City" placeholder="المدينة" />
-*@                <span asp-validation-for="City" class="text-danger"></span>
+
+                <span asp-validation-for="City" class="text-danger"></span>
             </div>
         </div>
         <div class="col">
@@ -73,8 +78,8 @@
     </div>
 
 
-    <!-- Submit button -->
-    <button type="submit" class="btn btn-primary btn-block mb-4 w-75" style="block-size:auto;">تسجيل</button>
+
+    <button type="submit" class="btn btn-block mb-4 w-75 text-white fw-bold" style="block-size:auto; background-color:#dfb600;">تسجيل</button>
     <div class="mt-2">
         <p class="text-danger">@TempData["errorRegister"]</p>
     </div>

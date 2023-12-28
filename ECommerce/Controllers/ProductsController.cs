@@ -1,6 +1,7 @@
 ﻿using ECommerce.Models;
 using ECommerce.Models.Repositories;
 using ECommerce.ViewModel;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
 
@@ -12,25 +13,35 @@ namespace ECommerce.Controllers
         private readonly IOperations<productOptions> _productOption;
         private readonly IOperations<options> _options;
         private readonly IToastNotification _ToastNotification;
-
-        public ProductsController(IToastNotification toastNotification, IOperations<Product> product, IOperations<productOptions> productOption, IOperations<options> options)
+        private readonly IDataProtector _dataProtector;
+        public ProductsController(IToastNotification toastNotification, IOperations<Product> product, IOperations<productOptions> productOption, IOperations<options> options, IDataProtectionProvider dataProtectionProvider)
         {
             _ToastNotification = toastNotification;
             _products = product;
             _productOption = productOption;
             _options = options;
+            _dataProtector = dataProtectionProvider.CreateProtector("ECommerce");
         }
         public IActionResult Index()
         {
             return RedirectToAction("index","Home");
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Details(string id)
         {
-            var product = _products.Find(id);
+            int idUnProtect = int.Parse(_dataProtector.Unprotect(id));
+            var product = _products.Find(idUnProtect);
             if(product != null)
             {
-                product.ProductViewModel = ProductOptionReturn(id);
+                product.ProductViewModel = ProductOptionReturn(idUnProtect);
+                foreach (var item in product.ProductViewModel.ExistingOptions)
+                {
+                    foreach(var subOption in item.SubOptions)
+                    {
+                        subOption.SubOptionCount = _options.Find(subOption.SubOptionId).count;
+                    }
+                }
+                
                 return View(product);
             }
 

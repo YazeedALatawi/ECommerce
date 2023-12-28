@@ -119,14 +119,16 @@
 </style>
 
 
+@{
+    ViewData["Title"] = "اتمام الطلب";
+}
 
 
-<!-- Shipping and Payment Section -->
 <div class="container">
             <form asp-action="CheckOut">
                 <input asp-for="totalPrice" type="hidden"/>
     <div class="row" dir="ltr">
-     <!-- Cart Summary on the Right -->
+
         <div id="cart_summary" dir="rtl" class="col-md-2 mt-5">
             <ul>
                 <li>
@@ -144,15 +146,14 @@
             </ul>
             <button type="submit" class="btn w-100 text-white" style="background-color:#dfb600; border-radius:0px; font-size:14px;">اكمال الدفع</button>
 
-            <!-- Add other summary details as needed -->
+
         </div>
 
         <div class="col-md-9 mt-5 p-0" dir="rtl">
             <div class="row" id="customerInfo">
                 <div>
                     <h3 style="font-size:20px; font-weight:900;">مرحبا بك @Model.firstName @Model.LastName</h3>
-                <!-- Shipping Form and Information -->
-                <!-- You can customize this section based on your requirements -->
+
             </div>
             </div>
             <div class="row">
@@ -172,11 +173,11 @@
 
                 </div>
                     <div class="edit-fields">
-                        <!-- أضف حقول التحرير هنا -->
+
                         <div class="row">
                             <div class="col-md-4">
                                 <label for="field1">اختر المدينة</label>
-@*                                <input type="text" id="field1" name="field1" class="form-control">*@
+
                                 <select asp-for="City" class="form-select" id="field1" aria-label="Default select example" required>
                                     <option disabled value="none">اختار المدينة</option>
                                     @foreach (var city in Model.AvailableCities)
@@ -201,16 +202,15 @@
                                 <label for="field3">الشارع</label>
                                     <input type="text" asp-for="Street" value="@Model.Street" id="field3" class="form-control">
                             </div>
-                            <!-- يمكنك إضافة المزيد من الأعمدة حسب الحاجة -->
+
                             <div class="d-flex justify-content-center mt-5">
-                                <!-- mt-3 لإضافة هامش أعلى -->
+
                                 <button type="button" class="btn text-white" style="background-color:#dfb600; font-size:14px; font-weight:500;" onclick="saveChanges()">حفظ التغييرات</button>
                             </div>
                            
                         </div>
                     </div>
-                <!-- Shipping Form and Information -->
-                <!-- You can customize this section based on your requirements -->
+
             </div>
             </div>
 
@@ -222,8 +222,6 @@
 
                 </div>
                 <p class="mt-5 text-center">هذه الخدمة غير متوفرة</p>
-                <!-- Payment Form and Information -->
-                <!-- You can customize this section based on your requirements -->
 
                     <button type="submit" class="btn w-100 text-white mt-5" style="background-color:#dfb600; border-radius:0px; font-size:14px;">اكمال الدفع</button>
             </div>
@@ -239,7 +237,7 @@
                     </form>  
 </div>
 
-<!-- Cart Summary in the Top Left -->
+
 
 
 @section Scripts{
@@ -277,7 +275,7 @@
                                 </p>
                             `;
 
-                    // إخفاء حقول التحرير
+
                     var editFields = document.querySelector('.edit-fields');
                     editFields.style.display = 'none';
                 }

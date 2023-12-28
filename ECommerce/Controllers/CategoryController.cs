@@ -1,11 +1,15 @@
-﻿using ECommerce.Models;
+﻿using System.Data;
+using ECommerce.Models;
 using ECommerce.Models.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
+using X.PagedList;
 
 namespace ECommerce.Controllers
 {
     [Route("admin/category/[action]/{id?}")]
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         private readonly IOperations<Category> category;
@@ -16,9 +20,32 @@ namespace ECommerce.Controllers
             this.category = category;
             this.toastNotification = toastNotification;
         }
-        public IActionResult Index()
+
+        IPagedList<Category> Search(string search, int? page)
         {
-            var model = category.List().ToList();
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return null;
+            }
+            else
+            {
+                var res = category.Search(search).ToPagedList(page ?? 1, 10);
+                return res;
+            }
+
+        }
+        public IActionResult Index(int? page, string search)
+        {
+            if (search != null)
+            {
+                var listSort = Search(search, page);
+                if (listSort != null)
+                {
+                    return View(listSort);
+                }
+            }
+
+            var model = category.List().ToList().ToPagedList(page ?? 1, 10);
             return View(model);
         }
 

@@ -2,10 +2,12 @@
 using ECommerce.Models.Repositories;
 using ECommerce.Models.Service;
 using ECommerce.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using NToastNotify;
 
 namespace ECommerce.Controllers
@@ -20,8 +22,8 @@ namespace ECommerce.Controllers
         private readonly IOperations<Cart> _carts;
         private readonly IOperations<CartProducts> _cartProducts;
         private readonly ShoppingCartService _shoppingCartService;
-
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IToastNotification toastNotification, ShoppingCartService shoppingCartService, IOperations<Product> products, IOperations<Cart> cart, IOperations<CartProducts> cartProducts, IOperations<User> userOperation)
+        private readonly RoleManager<IdentityRole> _roleManger;
+        public AccountController(UserManager<User> userManager, RoleManager<IdentityRole> roleManger, SignInManager<User> signInManager, IToastNotification toastNotification, ShoppingCartService shoppingCartService, IOperations<Product> products, IOperations<Cart> cart, IOperations<CartProducts> cartProducts, IOperations<User> userOperation)
 		{
 			this.userManager = userManager;
 			this.signInManager = signInManager;
@@ -31,8 +33,130 @@ namespace ECommerce.Controllers
             _carts = cart;
             _cartProducts = cartProducts;
             _shoppingCartService = shoppingCartService;
+            _roleManger = roleManger;
         }
 
+        [Authorize]
+
+
+        public IActionResult index()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = _userOperation.findByIdUser(userManager.GetUserId(User));
+                var model = new UserViewModel
+                {
+                    id = user.Id,
+                    Street = user.Street,
+                    City = user.City,
+                    District = user.District,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber
+                };
+
+
+                return View(model);
+            }
+
+            return RedirectToAction("index","home");
+        }
+
+
+        [Authorize]
+        public async Task<IActionResult> update(UserViewModel model)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if (ModelState.IsValid)
+                {
+                    var userID = userManager.GetUserId(User);
+                    var user = await userManager.FindByIdAsync(userID);
+                    if(await userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        _toastNotification.AddWarningToastMessage("لا يسمح بتغير بيانات هذا المستخدم");
+                        return RedirectToAction("Index");
+                    }
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.City = model.City;
+                    user.District = model.District;
+                    user.Email = model.Email;
+                    user.Street = model.Street;
+                    user.UserName = model.Email;
+
+                    var res = await userManager.UpdateAsync(user);
+
+                    if (res.Succeeded)
+                    {
+                        _toastNotification.AddSuccessToastMessage("تم تعديل البيانات");
+                        return RedirectToAction("index");
+                    }
+                    else
+                    {
+                        _toastNotification.AddErrorToastMessage("خطأ");
+                        return RedirectToAction("index");
+                    }
+                }
+                else
+                {
+                    _toastNotification.AddErrorToastMessage("خطا في ادخال البيانات");
+                    return RedirectToAction("index");
+                }
+
+            }
+            else
+            {
+                return RedirectToAction("index", "home");
+            }
+
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> changePassword(UserViewModel model)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if(ModelState.IsValid && model.RePassword == model.ConfirmPassword)
+                {
+                    var userID = userManager.GetUserId(User);
+                    var user = await userManager.FindByIdAsync(userID);
+
+                    if (await userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        _toastNotification.AddWarningToastMessage("لا يسمح بتغير بيانات هذا المستخدم");
+                        return RedirectToAction("Index");
+                    }
+
+                    IdentityResult check = await signInManager.UserManager.ChangePasswordAsync(user, model.Password, model.RePassword);
+                    if (check.Succeeded)
+                    {
+                        _toastNotification.AddSuccessToastMessage("تم تغير كلمة السر بنجاح");
+                        return RedirectToAction("index");
+                    }
+                    else
+                    {
+                        _toastNotification.AddErrorToastMessage("كلمة السر الحالية خطأ");
+                        return RedirectToAction("index");
+                    }
+                }
+                else
+                {
+                    _toastNotification.AddErrorToastMessage("خطأ في ادخال البيانات");
+                    return RedirectToAction("index");
+                }
+
+
+            }
+            else
+            {
+                return RedirectToAction("index","home");
+            }
+
+        }
 
         [HttpGet]
         public IActionResult Login()
@@ -48,6 +172,9 @@ namespace ECommerce.Controllers
 			if (result.Succeeded)
 			{
                 return Json(new { success = true }); 
+
+                // Admin@gmail.com, Admin123
+                // customer@gmail.com Customer123
             }
             else
 			{

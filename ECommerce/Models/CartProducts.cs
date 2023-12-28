@@ -18,5 +18,7 @@ namespace ECommerce.Models
 		[Required]
 		public int count { get; set; }
 		public List<CartPrdouctOptions> options { get; set; }
+		[NotMapped]
+		public string key { get; set; }
 	}
 }

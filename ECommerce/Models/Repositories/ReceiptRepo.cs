@@ -52,7 +52,12 @@
 			return db.Receipts.ToList();
 		}
 
-		public void update(Receipt entity)
+        public IList<Receipt> Search(string serach)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void update(Receipt entity)
 		{
 			db.Receipts.Update(entity);
 			db.SaveChanges();

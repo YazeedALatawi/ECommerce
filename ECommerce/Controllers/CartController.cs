@@ -2,9 +2,13 @@
 using ECommerce.Models.Repositories;
 using ECommerce.Models.Service;
 using ECommerce.ViewModel;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using NToastNotify;
 using static System.Formats.Asn1.AsnWriter;
 
 namespace ECommerce.Controllers
@@ -21,8 +25,10 @@ namespace ECommerce.Controllers
         private readonly IOperations<productOptions> _productOption;
         private readonly IOperations<options> _options;
         private readonly IOperations<CartPrdouctOptions> _cartProductsOptions;
+        private readonly IToastNotification toastNotification;
+        private readonly IDataProtector _dataProtector;
 
-        public CartController(ShoppingCartService shoppingCartService, IOperations<Product> products, IOperations<Cart> cart, UserManager<User> userManager, IOperations<CartProducts> cartProducts, IOperations<User> userOperation, IOperations<Order> order, IOperations<productOptions> productOption, IOperations<options> options, IOperations<CartPrdouctOptions> cartProductsOptions)
+        public CartController(ShoppingCartService shoppingCartService, IOperations<Product> products, IOperations<Cart> cart, UserManager<User> userManager, IOperations<CartProducts> cartProducts, IOperations<User> userOperation, IOperations<Order> order, IOperations<productOptions> productOption, IOperations<options> options, IOperations<CartPrdouctOptions> cartProductsOptions, IToastNotification toastNotification, IDataProtectionProvider dataProtectionProvider)
         {
             _shoppingCartService = shoppingCartService;
             _products = products;
@@ -34,6 +40,8 @@ namespace ECommerce.Controllers
             _productOption = productOption;
             _options = options;
             _cartProductsOptions = cartProductsOptions;
+            this.toastNotification = toastNotification;
+            _dataProtector = dataProtectionProvider.CreateProtector("ECommerce");
         }
 
         public IActionResult Index()
@@ -46,8 +54,24 @@ namespace ECommerce.Controllers
                 {
                     x.allprice = x.price * x.Quantity;
                     _totalPrice += x.allprice;
+                    x.key = _dataProtector.Protect(x.Id.ToString());
+
+                    if(x.ProductViewModel == null)
+                    {
+                        x.ProductViewModel = new ProductViewModel();
+                        x.ProductViewModel.ExistingOptions = ProductOptionReturnNoAuth(x.Id);
+                    }
+                    else
+                    {
+                        x.ProductViewModel.ExistingOptions = ProductOptionReturnNoAuth(x.Id);
+                    }
+
+
+                    
                 }
                 shoppingCart.totalPrice = _totalPrice;
+
+                
                 return View(shoppingCart);
             }
             else
@@ -76,11 +100,23 @@ namespace ECommerce.Controllers
                                     Quantity = item.count,
                                     price = theProduct.Price,
                                     allprice = item.count * theProduct.Price,
-                                    ProductViewModel = ProductOptionReturn(theProduct.Id, (List<CartProducts>)allproduct, cart)
-
+                                    ProductViewModel = ProductOptionReturn(theProduct.Id, (List<CartProducts>)allproduct, cart),
+                                    count = _products.Find(item.productId).Count,
+                                    key = _dataProtector.Protect(theProduct.Id.ToString())
                                 }
                             );
 
+                    }
+
+                    foreach(var item in shoppingCart.Products)
+                    {
+                        foreach(var option in item.ProductViewModel.ExistingOptions)
+                        {
+                            foreach(var subOption in option.SubOptions)
+                            {
+                                subOption.SubOptionCount = _options.Find(subOption.SubOptionId).count;
+                            }
+                        }
                     }
 
                     foreach(var item in shoppingCart.Products)
@@ -121,8 +157,10 @@ namespace ECommerce.Controllers
                         Name = product.Name,
                         price = product.Price,
                         image = product.Image,
-                        Quantity = quantity.Value
+                        Quantity = quantity.Value,
+                        ProductViewModel = prod.ProductViewModel
                     };
+
 
                     var contain = shopCart.Products.SingleOrDefault(p => p.Id == id);
                     if (contain == null)
@@ -163,6 +201,7 @@ namespace ECommerce.Controllers
                             productId = product.Id,
                         };
 
+                        
                         _cartProducts.Add(cartProduct);
                         var theCartProducts = _cartProducts.List();
 
@@ -204,6 +243,7 @@ namespace ECommerce.Controllers
                         {
                             userId = _userManager.GetUserId(User),
                             isDelete = false,
+
                         };
 
                         _cart.Add(newCart);
@@ -355,12 +395,133 @@ namespace ECommerce.Controllers
             {
 
                 var theCart = _cart.findByIdUser(_userManager.GetUserId(User));
-                if(theCart != null)
+                if(theCart != null && theCart.isDelete != true)
                 {
                     var theAllproducts = _cartProducts.findAllByCartId(theCart.Id);
                     double theTotalPrice = 0;
                     if(theAllproducts.Count > 0)
                     {
+                        foreach(var prod in shopping.Products)
+                        {
+                            if(prod.ProductViewModel != null)
+                            {
+                                foreach (var options in prod.ProductViewModel.SelectedOptions)
+                                {
+                                    if (options.OptionId != 0 && options.SubOptionId != 0)
+                                    {
+                                        var cartProductOption = _cartProductsOptions.List().FirstOrDefault(a => a.cartID == theCart.Id && a.ProductID == prod.Id && a.MainOptionID == options.OptionId && a.SubOptionID == options.SubOptionId);
+                                        if (cartProductOption == null)
+                                        {
+                                            var checkIsInTable = _cartProductsOptions.List().FirstOrDefault(a => a.cartID == theCart.Id && a.ProductID == prod.Id && a.MainOptionID == options.OptionId);
+                                            if (checkIsInTable != null)
+                                            {
+                                                var theProductInFinalCart = theAllproducts.FirstOrDefault(a => a.cartId == theCart.Id && a.productId == prod.Id);
+                                                var theOptionCountInStorage = _options.List().FirstOrDefault(a => a.Id == options.SubOptionId);
+                                                if(theProductInFinalCart.count != 0 && theProductInFinalCart.count <= theOptionCountInStorage.count && theOptionCountInStorage.count != 0)
+                                                {
+                                                    var subOptionsName = _options.Find(options.SubOptionId).Name;
+                                                    checkIsInTable.SubOptionID = options.SubOptionId;
+                                                    checkIsInTable.SubOptionName = subOptionsName;
+                                                    _cartProductsOptions.update(checkIsInTable);
+                                                }
+                                                else
+                                                {
+                                                    toastNotification.AddErrorToastMessage($"نفذت كمية {prod.Name} الكمية المتاحه ({theOptionCountInStorage.count.ToString()})");
+                                                    return RedirectToAction("index");
+                                                }
+
+                                            }
+                                            else
+                                            {
+
+                                                var theProductInFinalCart = theAllproducts.FirstOrDefault(a => a.cartId == theCart.Id && a.productId == prod.Id);
+                                                var theOptionCountInStorage = _options.List().FirstOrDefault(a => a.Id == options.SubOptionId);
+                                                if (theProductInFinalCart.count != 0 && theProductInFinalCart.count <= theOptionCountInStorage.count && theOptionCountInStorage.count != 0)
+                                                {
+                                                    var cartProductsID = _cartProducts.List().FirstOrDefault(a => a.productId == prod.Id && a.cartId == theCart.Id).Id;
+                                                    var mainOptionName = _productOption.Find(options.OptionId).name;
+                                                    var subOptionsName = _options.Find(options.SubOptionId).Name;
+                                                    if (cartProductsID != null && mainOptionName != null && subOptionsName != null)
+                                                    {
+                                                        var newCartProductsOptions = new CartPrdouctOptions
+                                                        {
+                                                            SubOptionID = options.SubOptionId,
+                                                            MainOptionID = options.OptionId,
+                                                            cartID = theCart.Id,
+                                                            ProductID = prod.Id,
+                                                            SubOptionName = subOptionsName,
+                                                            MainOptionName = mainOptionName,
+                                                            CartProductsID = cartProductsID,
+                                                        };
+
+                                                        _cartProductsOptions.Add(newCartProductsOptions);
+                                                    }
+                                                    else
+                                                    {
+                                                        toastNotification.AddErrorToastMessage("خطأ");
+                                                        return RedirectToAction("Index");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    toastNotification.AddErrorToastMessage($"نفذت كمية {prod.Name} الكمية المتاحه ({theOptionCountInStorage.count.ToString()})");
+                                                    return RedirectToAction("index");
+                                                }
+
+
+
+                                            }
+
+
+
+                                        }
+                                        else
+                                        {
+                                            var theProductInFinalCart = theAllproducts.FirstOrDefault(a => a.cartId == theCart.Id && a.productId == prod.Id);
+                                            var theOptionCountInStorage = _options.List().FirstOrDefault(a => a.Id == options.SubOptionId);
+                                            if (theProductInFinalCart.count != 0 && theProductInFinalCart.count <= theOptionCountInStorage.count && theOptionCountInStorage.count != 0)
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                toastNotification.AddErrorToastMessage($"نفذت كمية {prod.Name} الكمية المتاحه ( {theOptionCountInStorage.count.ToString()} )");
+                                                return RedirectToAction("index");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        toastNotification.AddErrorToastMessage("الرجاء اختيار خيارات المنتجات");
+                                        return RedirectToAction("Index");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var check = _productOption.List().FirstOrDefault(a => a.prdouctId == prod.Id);
+                                if(check != null)
+                                {
+                                    toastNotification.AddErrorToastMessage("الرجاء اختيار خيارات المنتج");
+                                    return RedirectToAction("Index");
+                                }
+                                else
+                                {
+                                    var product = _products.Find(prod.Id);
+                                    var theProductInFinalCart = theAllproducts.FirstOrDefault(a => a.cartId == theCart.Id && a.productId == prod.Id);
+                                    if(product.Count != 0 && theProductInFinalCart.count <= product.Count && theProductInFinalCart.count != 0)
+                                    {
+
+                                    }
+                                    else
+                                    {
+                                        toastNotification.AddErrorToastMessage($"نفذت كمية {product.Name} الكمية المتاحة ({product.Count})");
+                                        return RedirectToAction("index");
+                                    }
+                                }
+                            }
+                            
+                        }
                         
                         foreach (var item in theAllproducts)
                         {
@@ -384,15 +545,17 @@ namespace ECommerce.Controllers
                         theCart.totalPrice = model.totalPrice;
                         _cart.update(theCart);
 
-                        return View(model);
+                        return View("Checkout", model);
                     }
                     else
                     {
+                        toastNotification.AddErrorToastMessage("السله خاليه");
                         return RedirectToAction("index");
                     }
                 }
                 else
                 {
+                    toastNotification.AddErrorToastMessage("السله خاليه");
                     return RedirectToAction("index");
                 }
 
@@ -400,11 +563,13 @@ namespace ECommerce.Controllers
             }
             else
             {
+                toastNotification.AddErrorToastMessage("الرجاء تسجيل الدخول و التسوق");
                 return RedirectToAction("index");
             }
 
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult Checkout(CheckOutViewModel view)
         {
@@ -422,6 +587,10 @@ namespace ECommerce.Controllers
                     return RedirectToAction("index", "home");
                 }
 
+                
+
+
+
                 var newOrder = new Order
                 {
                     cartId = TheCart.Id,
@@ -434,6 +603,70 @@ namespace ECommerce.Controllers
                 var user = _userOperation.findByIdUser(TheCart.userId);
                 user.Street = view.Street; user.City = view.City; user.District = view.District;
                 _userOperation.update(user);
+
+
+                var theAllproducts = _cartProducts.findAllByCartId(TheCart.Id);
+                if (theAllproducts == null)
+                {
+                    toastNotification.AddErrorToastMessage("لاتوجد منتجات بالسله");
+                    return RedirectToAction("index");
+                }
+                else
+                {
+                    var itemInCart = new List<CartPrdouctOptions>();
+                    foreach (var item in theAllproducts)
+                    {
+                        item.product = _products.Find(item.productId);
+                        item.options = _cartProductsOptions.List().Where(a => a.cartID == TheCart.Id && a.ProductID == item.product.Id).ToList();
+                        if (item.product != null)
+                        {
+                            if (item.options != null)
+                            {
+                                foreach (var option in item.options)
+                                {
+                                    var theProductInFinalCart = theAllproducts.FirstOrDefault(a => a.cartId == TheCart.Id && a.productId == item.productId);
+                                    var theOptionCountInStorage = _options.List().FirstOrDefault(a => a.Id == option.SubOptionID);
+                                    if (theProductInFinalCart.count != 0 && theProductInFinalCart.count <= theOptionCountInStorage.count && theOptionCountInStorage.count != 0)
+                                    {
+                                        theOptionCountInStorage.count = theOptionCountInStorage.count - theProductInFinalCart.count;
+                                        _options.update(theOptionCountInStorage);
+                                    }
+                                    else
+                                    {
+                                        toastNotification.AddErrorToastMessage($"نفذت كمية {item.product.Name} الكمية المتاحة ({theOptionCountInStorage.count.ToString()})");
+                                        return RedirectToAction("index");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var product = _products.Find(item.product.Id);
+                                var theProductInFinalCart = theAllproducts.FirstOrDefault(a => a.cartId == TheCart.Id && a.productId == item.product.Id);
+                                if (product.Count != 0 && theProductInFinalCart.count <= product.Count && theProductInFinalCart.count != 0)
+                                {
+                                    product.Count = -theProductInFinalCart.count;
+                                    _products.update(product);
+                                }
+                                else
+                                {
+                                    toastNotification.AddErrorToastMessage($"نفذت كمية {product.Name} الكمية المتاحة ({product.Count})");
+                                    return RedirectToAction("index");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return RedirectToAction("index");
+                        }
+
+
+
+                    }
+
+
+
+                }
+
 
                 _order.Add(newOrder);
                 TheCart.isDelete = true;
@@ -543,6 +776,45 @@ namespace ECommerce.Controllers
             //    });
             //}
             return _model;
+        }
+
+        List<MainOptionViewModel> ProductOptionReturnNoAuth(int productID)
+        {
+            var productOption = _productOption.List();
+            var _model = new ProductViewModel
+            {
+                ProductId = productID,
+                ExistingOptions = productOption
+                    .Where(po => po.prdouctId == productID)
+                    .Select(po => new MainOptionViewModel
+                    {
+                        MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                        MainOptionName = po.name,
+                        SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                        {
+                            SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                            SubOptionName = o.Name,
+                            SubOptionCount = o.count
+                        }).ToList() ?? new List<SubOptionViewModel>()
+                    }).ToList(),
+
+            };
+
+            //var TheCart = _cart.findByIdUser(_userManager.GetUserId(User));
+            //var theCartproducts = _cartProducts.List().Where(a => a.cartId == TheCart.Id).ToList();
+            //_model.SelectedOptions = _cartProductsOptions.List().Where(a => a.ProductID == productID && a.cartID == cart.Id).Select(po => new ProductOptionViewModel { OptionId = po.MainOptionID, SubOptionId = po.SubOptionID }).ToList();
+
+            //foreach (var mainOption in _model.ExistingOptions)
+            //{
+            //    mainOption.SubOptions.Insert(0, new SubOptionViewModel
+            //    {
+            //        SubOptionId = -1,
+            //        SubOptionName = "اختار " + mainOption.MainOptionName,
+            //        MainOptionId = mainOption.MainOptionId,
+            //        SubOptionCount = -1
+            //    });
+            //}
+            return _model.ExistingOptions;
         }
     }
     

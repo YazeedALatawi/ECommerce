@@ -52,6 +52,11 @@
             return _db.CartProductsOptions.ToList();
         }
 
+        public IList<CartPrdouctOptions> Search(string serach)
+        {
+            throw new NotImplementedException();
+        }
+
         public void update(CartPrdouctOptions entity)
         {
             _db.CartProductsOptions.Update(entity);

@@ -31,6 +31,8 @@ namespace ECommerce.Models
 		public List<Comment> comments { get; set; }
 		[NotMapped]
         public ProductViewModel? ProductViewModel { get; set; }
+		[NotMapped]
+		public string key { get; set; }
 
-    }
+	}
 }

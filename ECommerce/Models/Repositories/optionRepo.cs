@@ -52,6 +52,11 @@ namespace ECommerce.Models.Repositories
             return _db.options.ToList();
         }
 
+        public IList<options> Search(string serach)
+        {
+            throw new NotImplementedException();
+        }
+
         public void update(options entity)
         {
             _db.options.Update(entity);

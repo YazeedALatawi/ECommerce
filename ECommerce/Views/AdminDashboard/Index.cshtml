@@ -1,6 +1,12 @@
-﻿
+﻿@model ECommerce.ViewModel.DashBoardViewModel
+@{
+	ViewData["Title"] = "لوحة التحكم";
+}
+
+
+
 <div class="container-fluid">
-	<div class="row flex-nowrap">
+	<div class="row flex-nowrap" style="width:80%">
 		<div class="bg-black col-auto col-md-4 col-lg-3 min-vh-100 d-flex flex-column justify-content-between" style="background-color:black !important;">
 			<div class="bg-black p-2" style="background-color:black !important;">
 				<ul class="nav nav-pills flex-column pt-3 px-0">
@@ -34,20 +40,63 @@
 							<span class="fs-5 d-none d-sm-inline me-2">الطلبيات</span>
 						</a>					
 					</li>
-					<li class="nav-item">
-						<a href="#" class="nav-link text-white">
-							<i class="fs-5 fa bi-person-fill-gear"></i>
-							<span class="fs-5 d-none d-sm-inline me-2">الادراة</span>
-						</a>
-					</li>
 				</ul>
 
 			</div>
 		</div>
 
-		<!--Content-->
+
 		<div>
 			<h3>لوحة التحكم</h3>
+
+			<hr />
+			<div class="d-flex justify-content-center align-items-center">
+				<div class="row row-cols-1 row-cols-md-2 g-5 mt-5" style="padding-right:30px">
+					<div class="col">
+						<div class="card text-bg-primary bg-success text-light mb-3 text-center" style="max-width: 18rem;">
+							<div class="card-header">اجمالي الارباح</div>
+							<div class="card-body p-4">
+								<h5 class="card-title">@Model.Profits ر.س</h5>
+								<p class="card-text"></p>
+							</div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="card text-bg-primary text-light bg-dark mb-3 text-center" style="max-width: 18rem;">
+							<div class="card-header">عدد المستخدمين</div>
+							<div class="card-body p-4">
+								<h5 class="card-title">@Model.NumUser</h5>
+								<p class="card-text"></p>
+							</div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="card text-bg-primary text-light bg-primary mb-3 text-center" style="max-width: 18rem;">
+							<div class="card-header">اجمالي عدد الطلبات</div>
+							<div class="card-body p-4">
+								<h5 class="card-title">@Model.numOrders</h5>
+								<p class="card-text"></p>
+							</div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="card text-bg-primary text-light bg-danger mb-3 text-center" style="max-width: 18rem;">
+							<div class="card-header">عدد الطلبات التي قيد التجهيز</div>
+							<div class="card-body p-4">
+								<h5 class="card-title">@Model.numOrdersUndelivered</h5>
+								<p class="card-text"></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+
+
+
+
 		</div>
 
 

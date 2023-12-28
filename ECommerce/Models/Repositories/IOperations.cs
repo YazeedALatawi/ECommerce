@@ -11,5 +11,6 @@
 		IList<Entity> findAllByCartId(int id);
         Entity FindString(string id);
 		bool findByIdProduct(int id);
+		IList<Entity> Search(string serach);
     }
 }

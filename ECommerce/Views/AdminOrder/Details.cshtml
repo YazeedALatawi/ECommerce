@@ -49,6 +49,17 @@
 }
     </tbody>
 </table>
+<h4>معلومات العميل</h4>
+<div class="form-label">
+    <p>اسم العميل : @Model.User.FirstName @Model.User.LastName</p>
+    <p>رقم الهاتف : @Model.User.PhoneNumber</p>
+    <h4>عنوان التوصيل</h4>
+    <div class="form-label" style="max-width:25%; padding-right:10px; border:black 1px solid; border-radius:10px;">
+    <p class="m-0">المدينة : @Model.User.City</p>
+    <p class="m-0">الحي : @Model.User.District</p>
+    <p class="m-0">الشارع : @Model.User.Street</p>
+    </div>
+</div>
 <form method="post" asp-action="Details">
     <div class="form-group mb-4">
     <label class="control-label">تحديث شركة الشحن</label>

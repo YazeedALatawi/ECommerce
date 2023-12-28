@@ -1,74 +1,79 @@
 ﻿@model ECommerce.ViewModel.ProductViewModel
 
-<style>
-    body{
-        background-color: #d7d7d7;
 
-    }
+@{
+    ViewData["Title"] = "خصائص المنتج";
+}
+<style>
+
 
     .list-group-item {
         border-radius: 15px !important;
     }
 
 </style>
-<form method="post" asp-controller="AdminProduct" asp-action="AddOptions">
-    <input type="hidden" asp-for="ProductId" />
 
-    <div class="mb-3">
+<div style="box-shadow:0px 9px 44px 33px rgba(0,0,0,0.1); border-radius:25px; padding:30px;" class="container mt-3">
+    <form method="post" asp-controller="AdminProduct" asp-action="AddOptions">
+        <input type="hidden" asp-for="ProductId" />
 
-        <div id="mainOptionsContainer">
-            @if (Model.MainOptions != null)
-            {
-                for (int i = 0; i < Model.MainOptions.Count; i++)
+        <div class="mb-3">
+
+            <div id="mainOptionsContainer">
+                @if (Model.MainOptions != null)
                 {
-                    <div class="main-option card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">الخيار الرئيسي @i:</h5>
-                            <div class="mb-3">
-                                <label asp-for="MainOptions[i].MainOptionName" class="form-label">اسم الخيار الرئيسي:</label>
-                                <input asp-for="MainOptions[i].MainOptionName" required class="form-control" />
-                            </div>
+                    for (int i = 0; i < Model.MainOptions.Count; i++)
+                    {
+                        <div class="main-option card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">الخيار الرئيسي @i:</h5>
+                                <div class="mb-3">
+                                    <label asp-for="MainOptions[i].MainOptionName" class="form-label">اسم الخيار الرئيسي:</label>
+                                    <input asp-for="MainOptions[i].MainOptionName" required class="form-control" />
+                                </div>
 
-                            <div class="sub-options-container">
-                                @if (Model.MainOptions[i].SubOptions != null)
-                                {
-                                    for (int j = 0; j < Model.MainOptions[i].SubOptions.Count; j++)
+                                <div class="sub-options-container">
+                                    @if (Model.MainOptions[i].SubOptions != null)
                                     {
-                                        <div class="sub-option form-group">
-                                            <h6>الخيار الفرعي @j:</h6>
-                                            <div class="mb-3">
-                                                <label asp-for="MainOptions[i].SubOptions[j].SubOptionName" class="form-label">اسم الخيار الفرعي:</label>
-                                                <input asp-for="MainOptions[i].SubOptions[j].SubOptionName" required class="form-control" />
+                                        for (int j = 0; j < Model.MainOptions[i].SubOptions.Count; j++)
+                                        {
+                                            <div class="sub-option form-group">
+                                                <h6>الخيار الفرعي @j:</h6>
+                                                <div class="mb-3">
+                                                    <label asp-for="MainOptions[i].SubOptions[j].SubOptionName" class="form-label">اسم الخيار الفرعي:</label>
+                                                    <input asp-for="MainOptions[i].SubOptions[j].SubOptionName" required class="form-control" />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label asp-for="MainOptions[i].SubOptions[j].SubOptionCount" class="form-label">الكمية:</label>
+                                                    <input asp-for="MainOptions[i].SubOptions[j].SubOptionCount" required type="number" class="form-control" />
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label asp-for="MainOptions[i].SubOptions[j].SubOptionCount" class="form-label">الكمية:</label>
-                                                <input asp-for="MainOptions[i].SubOptions[j].SubOptionCount" required type="number" class="form-control" />
-                                            </div>
-                                        </div>
+                                        }
                                     }
-                                }
-                            </div>
+                                </div>
 
-                            <button type="button" onclick="addSubOption(@i)" class="btn btn-secondary mt-3">إضافة خيار فرعي</button>
+                                <button type="button" onclick="addSubOption(@i)" class="btn btn-secondary mt-3">إضافة خيار فرعي</button>
+                            </div>
                         </div>
-                    </div>
+                    }
                 }
-            }
+            </div>
+
+            <button type="button" onclick="addMainOption()" class="btn btn-primary mt-3">إضافة خيار رئيسي</button>
         </div>
 
-        <button type="button" onclick="addMainOption()" class="btn btn-primary mt-3">إضافة خيار رئيسي</button>
-    </div>
+        <button type="submit" class="btn btn-success">حفظ الخيارات</button>
+    </form>
 
-    <button type="submit" class="btn btn-success">حفظ الخيارات</button>
-</form>
 
-@*<h2>Existing Options</h2>*@
-@if (Model.ExistingOptions != null && Model.ExistingOptions.Any())
-{
-    <ul class="list-group mt-5">
+    @if (Model.ExistingOptions != null && Model.ExistingOptions.Any())
+    {
+
+
+
         @foreach (var existingOption in Model.ExistingOptions)
         {
-            <li class="list-group-item">
+            <li class="list-group-item mt-2">
                 <form method="post" asp-controller="AdminProduct" asp-action="DeleteMainOption" class="d-inline">
                     <input type="hidden" name="productId" value="@Model.ProductId" />
                     <input type="hidden" name="mainOptionId" value="@existingOption.MainOptionId" />
@@ -85,51 +90,80 @@
                                 <input type="hidden" name="mainOptionId" value="@existingOption.MainOptionId" />
                                 <input type="hidden" name="subOptionId" value="@subOption.SubOptionId" />
                                 <button type="submit" class="btn btn-danger" style="padding:2px 5px;"><i class="bi bi-trash-fill"></i></button>
-                                <span class="me-3"><span style="font-weight:700;">@subOption.SubOptionName</span>   -  الكمية (@subOption.SubOptionCount)</span>
+                                <span class="me-3"><span style="font-weight:700;">@subOption.SubOptionName</span> - الكمية (@subOption.SubOptionCount)</span>
+                            </form>
+
+
+                            <button class="btn btn-warning me-5" style="font-size: 13px; padding: 3px; background-color:white; border-color:white;" onclick="showEditFields1(@existingOption.MainOptionId, @subOption.SubOptionId, '@subOption.SubOptionName', @subOption.SubOptionCount)">
+                                <i class="bi bi-pencil-fill"></i> تعديل
+                            </button>
+
+                            <form method="post" asp-controller="AdminProduct" asp-action="EditSubOption" class="edit-fields mt-3" style="display:none;" id="formEditSubOption_@existingOption.MainOptionId _@subOption.SubOptionId">
+                                <input type="hidden" name="productId" value="@Model.ProductId" />
+                                <input type="hidden" name="mainOptionId" value="@existingOption.MainOptionId" />
+                                <input type="hidden" name="subOptionId" value="@subOption.SubOptionId" />
+
+                                <input type="text" name="SubOptionName" required placeholder="اسم الخيار" value="" />
+                                <input type="number" name="SubOptionCount" required placeholder="الكمية" value="" />
+
+                                <button type="submit" class="btn btn-success btn-sm">حفظ</button>
 
                             </form>
+
                         </li>
                     }
                 </ul>
 
+                <button class="btn" onclick="showEditFields(@existingOption.MainOptionId)" style="padding: 1px 5px;">
+                    <i class="bi bi-plus-circle-fill text-success" style="font-size:25px;"></i>
+                </button>
 
-                <!-- Add SubOption Form -->
-                <button class="btn" onclick="showEditFields()" style="padding: 1px 5px;"><i class="bi bi-plus-circle-fill text-success" style="font-size:25px;"></i></button>
-                <form method="post" asp-controller="AdminProduct" asp-action="AddSubOption" class="mt-3" style="display:none;" id="formAddSubOption">
 
+                <form method="post" asp-controller="AdminProduct" asp-action="AddSubOption" class="mt-3" style="display:none;" id="formAddSubOption_@existingOption.MainOptionId">
                     <input type="hidden" name="productId" value="@Model.ProductId" />
                     <input type="hidden" name="mainOptionId" value="@existingOption.MainOptionId" />
 
                     <div class="mb-3">
                         <label class="form-label">اسم الخيار الفرعي:</label>
-                        <input type="text" name="subOptionName" asp-for="SubOption" class="form-control" required placeholder="مثال احمر" />
+                        <input type="text" name="SubOptionName" class="form-control" required placeholder="مثال احمر" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">الكمية:</label>
-                        <input type="number" name="subOptionCount" asp-for="count" required class="form-control" />
+                        <input type="number" name="SubOptionCount" required class="form-control" />
                     </div>
 
                     <button type="submit" class="btn btn-success">حفظ</button>
-
                 </form>
-
-
-
-
             </li>
         }
-    </ul>
-}
-else
-{
-    <p class="text-danger">المنتج ليس له خيارات</p>
-    
-}
+    }
+    else
+    {
+        <p class="text-danger">المنتج ليس له خيارات</p>
+
+    }
+
+</div>
 
 
 
 @section Scripts {
 
+
+    <script>
+        function showEditFields1(mainOptionId, subOptionId, subOptionName, subOptionCount) {
+            var editFields = document.getElementById(`formEditSubOption_${mainOptionId} _${subOptionId}`);
+            if (editFields.style.display === 'none') {
+                editFields.style.display = 'block';
+            } else {
+                editFields.style.display = 'none';
+            }
+
+
+            editFields.querySelector('[name$="SubOptionName"]').value = subOptionName;
+            editFields.querySelector('[name$="SubOptionCount"]').value = subOptionCount;
+        }
+    </script>
 
 
 
@@ -138,15 +172,13 @@ else
         document.getElementById("container").classList.remove('pe-0');
 
 
-        function showEditFields() {
-            var editFields = document.getElementById("formAddSubOption")
-            if(editFields.style.display == 'none'){
+        function showEditFields(mainOptionIndex) {
+            var editFields = document.getElementById(`formAddSubOption_${mainOptionIndex}`);
+            if (editFields.style.display == 'none') {
                 editFields.style.display = 'block';
-            }
-            else{
+            } else {
                 editFields.style.display = 'none';
             }
-
         }
     </script>
 
@@ -157,7 +189,7 @@ else
         function addMainOption() {
             var mainOptionsContainer = document.getElementById("mainOptionsContainer");
 
-            // إنشاء حاوية للخيار الرئيسي
+
             var mainOptionContainer = document.createElement("div");
             mainOptionContainer.className = "main-option card mt-3";
             mainOptionContainer.innerHTML = `
@@ -172,17 +204,15 @@ else
                     </div>
                 `;
 
-            // إضافة الخيار الرئيسي إلى الحاوية
             mainOptionsContainer.appendChild(mainOptionContainer);
 
-            // زيادة عداد الخيارات الرئيسية
             mainOptionCounter++;
         }
 
         function addSubOption(mainOptionIndex) {
             var subOptionsContainer = document.querySelectorAll('.main-option')[mainOptionIndex].querySelector('.sub-options-container');
 
-            // إنشاء حاوية للخيار الفرعي
+
             var subOptionContainer = document.createElement("div");
             subOptionContainer.className = "sub-option card mt-3";
             subOptionContainer.innerHTML = `
@@ -198,7 +228,7 @@ else
                     </div>
                 `;
 
-            // إضافة الخيار الفرعي إلى الحاوية
+
             subOptionsContainer.appendChild(subOptionContainer);
         }
     </script>
@@ -212,29 +242,29 @@ else
             var subOptionName = document.getElementById("subOptionName").value;
             var subOptionCount = document.getElementById("subOptionCount").value;
 
-            // إرسال البيانات إلى الخلفية باستخدام fetch أو XMLHttpRequest
+
             fetch('/AdminProduct/AddSubOption', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    productId: YOUR_PRODUCT_ID, // استبدل بالقيمة الفعلية
-                    mainOptionId: YOUR_MAIN_OPTION_ID, // استبدل بالقيمة الفعلية
+                    productId: YOUR_PRODUCT_ID, 
+                    mainOptionId: YOUR_MAIN_OPTION_ID, 
                     subOptionName: subOptionName,
                     subOptionCount: subOptionCount,
                 }),
             })
                 .then(response => response.json())
                 .then(data => {
-                    // قم بمعالجة الرد هنا إذا كنت بحاجة إلى ذلك
+
                     console.log('Success:', data);
                 })
                 .catch((error) => {
                     console.error('Error:', error);
                 });
 
-            // إخفاء نموذج الإدخال بعد الإرسال
+
             document.getElementById("subOptionForm").style.display = "none";
         }
     </script>

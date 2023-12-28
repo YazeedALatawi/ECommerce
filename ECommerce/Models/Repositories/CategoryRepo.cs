@@ -54,7 +54,13 @@ namespace ECommerce.Models.Repositories
 			return db.Categories.ToList();
 		}
 
-		public void update(Category entity)
+        public IList<Category> Search(string serach)
+        {
+			var res = db.Categories.Where(a => a.Id.ToString().Contains(serach) || a.Name.Contains(serach)).ToList();
+			return res;
+        }
+
+        public void update(Category entity)
 		{
 			db.Categories.Update(entity);
 			db.SaveChanges();

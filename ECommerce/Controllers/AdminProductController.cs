@@ -1,18 +1,21 @@
 ﻿using System.Configuration;
+using System.Data;
 using System.Text.Encodings.Web;
 using ECommerce.Models;
 using ECommerce.Models.Repositories;
 using ECommerce.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
-using static NuGet.Packaging.PackagingConstants;
+using X.PagedList;
 
 namespace ECommerce.Controllers
 {
     [Route("admin/Product/[action]/{id?}")]
+    [Authorize(Roles = "Admin")]
     public class AdminProductController : Controller
     {
         private readonly IOperations<Product> _products;
@@ -32,10 +35,242 @@ namespace ECommerce.Controllers
             _options = options;
         }
 
-        [HttpGet]
-        public IActionResult Index()
+         IPagedList<Product> sort(string colName, int? page)
         {
-            var listProducts = _products.List();
+            if(colName == "name")
+            {
+                var res = _products.List().OrderBy(a => a.Name).ToList().ToPagedList(page ?? 1, 8);
+                var productOption = _productOption.List();
+                foreach (var options in res)
+                {
+                    var _model = new ProductViewModel
+                    {
+                        ProductId = options.Id,
+                        ExistingOptions = productOption
+                        .Where(po => po.prdouctId == options.Id)
+                        .Select(po => new MainOptionViewModel
+                        {
+                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionName = po.name,
+                            SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                            {
+                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionName = o.Name,
+                                SubOptionCount = o.count
+                            }).ToList() ?? new List<SubOptionViewModel>()
+                        }).ToList()
+                    };
+
+                    options.ProductViewModel = _model;
+                }
+                return res;
+            }
+            else if(colName == "cate")
+            {
+                var res = _products.List().OrderBy(a => a.category.Name).ToList().ToPagedList(page ?? 1, 8);
+                var productOption = _productOption.List();
+                foreach (var options in res)
+                {
+                    var _model = new ProductViewModel
+                    {
+                        ProductId = options.Id,
+                        ExistingOptions = productOption
+                        .Where(po => po.prdouctId == options.Id)
+                        .Select(po => new MainOptionViewModel
+                        {
+                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionName = po.name,
+                            SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                            {
+                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionName = o.Name,
+                                SubOptionCount = o.count
+                            }).ToList() ?? new List<SubOptionViewModel>()
+                        }).ToList()
+                    };
+
+                    options.ProductViewModel = _model;
+                }
+                return res;
+            }
+            else if(colName == "pri")
+            {
+                var res = _products.List().OrderByDescending(a => a.Price).ToList().ToPagedList(page ?? 1, 8);
+                var productOption = _productOption.List();
+                foreach (var options in res)
+                {
+                    var _model = new ProductViewModel
+                    {
+                        ProductId = options.Id,
+                        ExistingOptions = productOption
+                        .Where(po => po.prdouctId == options.Id)
+                        .Select(po => new MainOptionViewModel
+                        {
+                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionName = po.name,
+                            SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                            {
+                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionName = o.Name,
+                                SubOptionCount = o.count
+                            }).ToList() ?? new List<SubOptionViewModel>()
+                        }).ToList()
+                    };
+
+                    options.ProductViewModel = _model;
+                }
+
+                return res;
+            }
+            else if(colName == "dis")
+            {
+                var res = _products.List().OrderByDescending(a => a.Discount).ToList().ToPagedList(page ?? 1, 8);
+                var productOption = _productOption.List();
+                foreach (var options in res)
+                {
+                    var _model = new ProductViewModel
+                    {
+                        ProductId = options.Id,
+                        ExistingOptions = productOption
+                        .Where(po => po.prdouctId == options.Id)
+                        .Select(po => new MainOptionViewModel
+                        {
+                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionName = po.name,
+                            SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                            {
+                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionName = o.Name,
+                                SubOptionCount = o.count
+                            }).ToList() ?? new List<SubOptionViewModel>()
+                        }).ToList()
+                    };
+
+                    options.ProductViewModel = _model;
+                }
+
+                return res;
+            }
+            else if(colName == "count")
+            {
+                var res = _products.List().OrderByDescending(a => a.Count).ToList().ToPagedList(page ?? 1, 8);
+                var productOption = _productOption.List();
+                foreach (var options in res)
+                {
+                    var _model = new ProductViewModel
+                    {
+                        ProductId = options.Id,
+                        ExistingOptions = productOption
+                        .Where(po => po.prdouctId == options.Id)
+                        .Select(po => new MainOptionViewModel
+                        {
+                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionName = po.name,
+                            SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                            {
+                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionName = o.Name,
+                                SubOptionCount = o.count
+                            }).ToList() ?? new List<SubOptionViewModel>()
+                        }).ToList()
+                    };
+
+                    options.ProductViewModel = _model;
+                }
+
+                return res;
+            }
+            else
+            {
+                return null;
+            }
+
+
+        }
+        IPagedList<Product> Search(int? page, string search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return null;
+            }
+            else
+            {
+                var res = _products.Search(search).ToPagedList(page ?? 1, 8);
+                var productOption = _productOption.List();
+                foreach (var options in res)
+                {
+                    var _model = new ProductViewModel
+                    {
+                        ProductId = options.Id,
+                        ExistingOptions = productOption
+                        .Where(po => po.prdouctId == options.Id)
+                        .Select(po => new MainOptionViewModel
+                        {
+                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionName = po.name,
+                            SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                            {
+                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionName = o.Name,
+                                SubOptionCount = o.count
+                            }).ToList() ?? new List<SubOptionViewModel>()
+                        }).ToList()
+                    };
+
+                    options.ProductViewModel = _model;
+                }
+                return res;
+            }
+
+        }
+
+        [HttpGet]
+        public IActionResult Index(int? page, string? colName, string search)
+        {
+            if (colName != null && search == null)
+            {
+                var listSort = sort(colName, page);
+                if(listSort != null)
+                {
+                    return View(listSort);
+                }
+            }
+
+            if(search != null)
+            {
+                var listSort = Search(page, search);
+                if (listSort != null)
+                {
+                    return View(listSort);
+                }
+            }
+
+
+            var listProducts = _products.List().OrderBy(a => a.Id).ToPagedList(page ?? 1, 8);
+            var productOption = _productOption.List();
+            foreach (var options in listProducts)
+            {
+                var _model = new ProductViewModel
+                {
+                    ProductId = options.Id,
+                    ExistingOptions = productOption
+                    .Where(po => po.prdouctId == options.Id)
+                    .Select(po => new MainOptionViewModel
+                    {
+                        MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                        MainOptionName = po.name,
+                        SubOptions = po.Options?.Select(o => new SubOptionViewModel
+                        {
+                            SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                            SubOptionName = o.Name,
+                            SubOptionCount = o.count
+                        }).ToList() ?? new List<SubOptionViewModel>()
+                    }).ToList()
+                };
+
+                options.ProductViewModel = _model;
+
+            }
             return View(listProducts);
         }
 
@@ -50,7 +285,7 @@ namespace ECommerce.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ViewModelProduct product)
+        public async Task<IActionResult> Create(ViewModelProduct product)
         {
             if (ModelState.IsValid)
             {
@@ -61,7 +296,7 @@ namespace ECommerce.Controllers
                     string allPath = folder.ToString();
                     string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
                     FileStream fs = new FileStream(serverFolder, FileMode.Create);
-                    product.image.CopyToAsync(fs);
+                    await product.image.CopyToAsync(fs);
                     fs.Close();
 
                     var TheCategory = _category.Find(product.categoryId);
@@ -332,6 +567,24 @@ namespace ECommerce.Controllers
 
             return RedirectToAction("Options", new { id = productId });
         }
+
+        [HttpPost]
+        public IActionResult EditSubOption(int productId, int mainOptionId, int subOptionId, string SubOptionName, int SubOptionCount)
+        {
+            var theOption = _options.Find(subOptionId);
+            if(theOption != null && subOptionId != 0 && SubOptionCount != 0 && SubOptionName != null && SubOptionCount <= 100000)
+            {
+                theOption.Name = SubOptionName;
+                theOption.count = SubOptionCount;
+                _options.update(theOption);
+                toastNotification.AddSuccessToastMessage("تم التعديل بنجاح");
+                return RedirectToAction("Options", new { id = productId });
+            }
+            toastNotification.AddErrorToastMessage("خطأ في تعبئة البيانات");
+            return RedirectToAction("Options", new { id = productId });
+        }
+
+        
 
 
 

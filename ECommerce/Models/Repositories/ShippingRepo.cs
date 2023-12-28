@@ -52,7 +52,13 @@
 			return db.Shippings.ToList();
 		}
 
-		public void update(Shipping entity)
+        public IList<Shipping> Search(string serach)
+        {
+			var res = db.Shippings.Where(a => a.Name.Contains(serach) || a.Id.ToString().Contains(serach)).ToList();
+			return res;
+        }
+
+        public void update(Shipping entity)
 		{
 			db.Shippings.Update(entity);
 			db.SaveChanges();

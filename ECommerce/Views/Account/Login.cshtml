@@ -8,21 +8,24 @@
 
 <form method="post" asp-action="Login" asp-controller="Account" id="loginForm">
     <div class="form-group">
-        <label for="exampleInputEmail1">الايميل</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" asp-for="Email" aria-describedby="emailHelp" placeholder="الايميل" required>
+        <label class="badge bg-dark" for="exampleInputEmail1">الايميل</label>
+        <input type="email" class="form-control mt-1" id="exampleInputEmail1" asp-for="Email" aria-describedby="emailHelp" placeholder="الايميل" required>
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
     <div class="form-group mt-2">
-        <label for="exampleInputPassword1">الباسورد</label>
-        <input type="password" class="form-control" asp-for="Password" id="exampleInputPassword1" placeholder="الباسورد" required>
+        <label class="badge bg-dark" for="exampleInputPassword1">الباسورد</label>
+        <input type="password" class="form-control mt-1" asp-for="Password" id="exampleInputPassword1" placeholder="الباسورد" required>
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
     <div class="form-group form-check mt-2">
         <label class="form-check-label" for="exampleCheck1">تذكرني</label>
         <input type="checkbox" asp-for="RememberMe" class="" id="exampleCheck1">
     </div>
-    <button type="submit" id="submitButton" disabled class="btn btn-primary mt-5">تسجيل دخول</button>
-    <a class="btn btn-success mt-5" asp-action="Register" asp-controller="Account">تسجيل جديد</a>
+    <button type="submit" id="submitButton" style="background-color:#dfb600;" disabled class="btn w-100 mt-3 text-white fw-bold">تسجيل دخول</button>
+    <div class="mt-2 p-2">
+        <a class="badge text-black" style="background-color:#dfb600;" asp-action="Register" asp-controller="Account">تسجيل جديد؟</a>
+    </div>
+
 </form>
 
 
