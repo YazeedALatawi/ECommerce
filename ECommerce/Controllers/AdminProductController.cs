@@ -19,7 +19,7 @@ namespace ECommerce.Controllers
     public class AdminProductController : Controller
     {
         private readonly IOperations<Product> _products;
-        private readonly IOperations<Category> _category;
+        private readonly IOperations<Category> _category; 
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
 		private readonly IOperations<productOptions> _productOption;
@@ -50,11 +50,11 @@ namespace ECommerce.Controllers
                         .Where(po => po.prdouctId == options.Id)
                         .Select(po => new MainOptionViewModel
                         {
-                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionId = po.Id,
                             MainOptionName = po.name,
                             SubOptions = po.Options?.Select(o => new SubOptionViewModel
                             {
-                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionId = o.Id, 
                                 SubOptionName = o.Name,
                                 SubOptionCount = o.count
                             }).ToList() ?? new List<SubOptionViewModel>()
@@ -78,11 +78,11 @@ namespace ECommerce.Controllers
                         .Where(po => po.prdouctId == options.Id)
                         .Select(po => new MainOptionViewModel
                         {
-                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionId = po.Id, 
                             MainOptionName = po.name,
                             SubOptions = po.Options?.Select(o => new SubOptionViewModel
                             {
-                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionId = o.Id, 
                                 SubOptionName = o.Name,
                                 SubOptionCount = o.count
                             }).ToList() ?? new List<SubOptionViewModel>()
@@ -106,11 +106,11 @@ namespace ECommerce.Controllers
                         .Where(po => po.prdouctId == options.Id)
                         .Select(po => new MainOptionViewModel
                         {
-                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionId = po.Id, 
                             MainOptionName = po.name,
                             SubOptions = po.Options?.Select(o => new SubOptionViewModel
                             {
-                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionId = o.Id,
                                 SubOptionName = o.Name,
                                 SubOptionCount = o.count
                             }).ToList() ?? new List<SubOptionViewModel>()
@@ -135,11 +135,11 @@ namespace ECommerce.Controllers
                         .Where(po => po.prdouctId == options.Id)
                         .Select(po => new MainOptionViewModel
                         {
-                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionId = po.Id, 
                             MainOptionName = po.name,
                             SubOptions = po.Options?.Select(o => new SubOptionViewModel
                             {
-                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionId = o.Id, 
                                 SubOptionName = o.Name,
                                 SubOptionCount = o.count
                             }).ToList() ?? new List<SubOptionViewModel>()
@@ -164,11 +164,11 @@ namespace ECommerce.Controllers
                         .Where(po => po.prdouctId == options.Id)
                         .Select(po => new MainOptionViewModel
                         {
-                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionId = po.Id, 
                             MainOptionName = po.name,
                             SubOptions = po.Options?.Select(o => new SubOptionViewModel
                             {
-                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionId = o.Id, 
                                 SubOptionName = o.Name,
                                 SubOptionCount = o.count
                             }).ToList() ?? new List<SubOptionViewModel>()
@@ -206,11 +206,11 @@ namespace ECommerce.Controllers
                         .Where(po => po.prdouctId == options.Id)
                         .Select(po => new MainOptionViewModel
                         {
-                            MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                            MainOptionId = po.Id, 
                             MainOptionName = po.name,
                             SubOptions = po.Options?.Select(o => new SubOptionViewModel
                             {
-                                SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                                SubOptionId = o.Id, 
                                 SubOptionName = o.Name,
                                 SubOptionCount = o.count
                             }).ToList() ?? new List<SubOptionViewModel>()
@@ -257,11 +257,11 @@ namespace ECommerce.Controllers
                     .Where(po => po.prdouctId == options.Id)
                     .Select(po => new MainOptionViewModel
                     {
-                        MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                        MainOptionId = po.Id,
                         MainOptionName = po.name,
                         SubOptions = po.Options?.Select(o => new SubOptionViewModel
                         {
-                            SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                            SubOptionId = o.Id,
                             SubOptionName = o.Name,
                             SubOptionCount = o.count
                         }).ToList() ?? new List<SubOptionViewModel>()
@@ -425,11 +425,11 @@ namespace ECommerce.Controllers
                     .Where(po => po.prdouctId == id)
                     .Select(po => new MainOptionViewModel
                     {
-                        MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                        MainOptionId = po.Id, 
                         MainOptionName = po.name,
                         SubOptions = po.Options?.Select(o => new SubOptionViewModel
                         {
-                            SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                            SubOptionId = o.Id, 
                             SubOptionName = o.Name,
                             SubOptionCount = o.count
                         }).ToList() ?? new List<SubOptionViewModel>()
@@ -487,12 +487,10 @@ namespace ECommerce.Controllers
 
                     }
 
-                    // يمكنك حفظ التغييرات في قاعدة البيانات هنا
                 }
             }
 
-            // يمكنك الوصول إلى viewModel وتحديث قاعدة البيانات أو القيام بالمعالجة اللازمة
-            // ثم إعادة توجيه المستخدم أو عرض عرض آخر حسب حاجتك
+
             toastNotification.AddErrorToastMessage("الرجاء اضافة اسم الخيار الرئيسي واضافة الخيارات الفرعيه له ثم الحفظ");
             return RedirectToAction("Options", new { id = viewModel.ProductId });
         }
@@ -501,13 +499,11 @@ namespace ECommerce.Controllers
         [HttpPost]
         public IActionResult DeleteSubOption(int productId, int mainOptionId, int subOptionId)
         {
-            // ابحث عن الخيار الرئيسي والفرعي الذي تم حذفه
             var optionToDelete = _productOption.List()
                 .FirstOrDefault(po => po.prdouctId == productId && po.Id == mainOptionId);
 
             if (optionToDelete != null)
             {
-                // ابحث عن الخيار الفرعي داخل الخيار الرئيسي
                 var subOptionToDelete = optionToDelete.Options?.FirstOrDefault(o => o.Id == subOptionId);
 
                 if (subOptionToDelete != null)
@@ -527,7 +523,6 @@ namespace ECommerce.Controllers
         [HttpPost]
         public IActionResult DeleteMainOption(int productId, int mainOptionId)
         {
-            // ابحث عن الخيار الرئيسي والفرعي الذي تم حذفه
             var option = _productOption.List();
             var optionToDelete = option.FirstOrDefault(x => x.Id == mainOptionId);
 
@@ -543,7 +538,6 @@ namespace ECommerce.Controllers
                 _productOption.delete(optionToDelete.Id);
             }
 
-            // بعد الحذف، قم بإعادة توجيه المستخدم إلى صفحة الإضافة
             return RedirectToAction("Options", new { id = productId });
         }
 

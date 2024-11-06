@@ -60,11 +60,11 @@ namespace ECommerce.Controllers
                     .Where(po => po.prdouctId == productID)
                     .Select(po => new MainOptionViewModel
                     {
-                        MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                        MainOptionId = po.Id, 
                         MainOptionName = po.name,
                         SubOptions = po.Options?.Select(o => new SubOptionViewModel
                         {
-                            SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                            SubOptionId = o.Id, 
                             SubOptionName = o.Name,
                             SubOptionCount = o.count
                         }).ToList() ?? new List<SubOptionViewModel>()

@@ -17,17 +17,17 @@
 
     public class MainOptionViewModel
     {
-        public int MainOptionId { get; set; } // معرّف الخيار الرئيسي
+        public int MainOptionId { get; set; } 
         public string MainOptionName { get; set; }
         public List<SubOptionViewModel> SubOptions { get; set; }
     }
 
     public class SubOptionViewModel
     {
-        public int SubOptionId { get; set; } // معرّف الخيار الفرعي
+        public int SubOptionId { get; set; } 
         public string SubOptionName { get; set; }
         public int SubOptionCount { get; set; }
-        public int MainOptionId { get; set; } // معرّف الخيار الرئيسي
+        public int MainOptionId { get; set; } 
     }
 
     public class ProductOptionViewModel

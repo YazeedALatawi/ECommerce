@@ -174,8 +174,7 @@ namespace ECommerce.Controllers
                 }
 
                 return Json(new { success = true });
-                // Admin@gmail.com, Admin123
-                // customer@gmail.com Customer123
+                // Admin@gmail.com,
             }
             else
             {

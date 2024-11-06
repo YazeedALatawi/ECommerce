@@ -32,7 +32,6 @@ namespace ECommerce.ViewModel
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "هذا الحقل اجباري")]
-        //[StringLength(30, ErrorMessage = "يجب ان يتكون اسم المدينة من 2 - 30 حرف", MinimumLength = 2)]
         public string City { get; set; }
 
         [MinLength(3), MaxLength(18), Required(ErrorMessage = "هذا الحقل اجباري")]

@@ -111,7 +111,7 @@
                         </i></a>
 
                         <div class="dropdown show ms-5">
-                            @if (signInManager.IsSignedIn(User))
+                            @if (signInManager.IsSignedIn(User) && User.Identity.IsAuthenticated)
                             {
                                 var user = await userManager.GetUserAsync(User);
                                 <a class="nav-link text-white mx-3 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

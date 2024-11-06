@@ -355,7 +355,6 @@ namespace ECommerce.Controllers
                 quantity++;
                 theProduct.count = quantity;
                 _cartProducts.update(theProduct);
-                //return RedirectToAction("Index");
                 return Json(theProduct.count);
             }
 
@@ -379,7 +378,6 @@ namespace ECommerce.Controllers
                 quantity--;
                 theProduct.count = quantity;
                 _cartProducts.update(theProduct);
-                //return RedirectToAction("Index");
                 return Json(theProduct.count);
 
             }
@@ -749,11 +747,11 @@ namespace ECommerce.Controllers
                     .Where(po => po.prdouctId == productID)
                     .Select(po => new MainOptionViewModel
                     {
-                        MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                        MainOptionId = po.Id,
                         MainOptionName = po.name,
                         SubOptions = po.Options?.Select(o => new SubOptionViewModel
                         {
-                            SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                            SubOptionId = o.Id, 
                             SubOptionName = o.Name,
                             SubOptionCount = o.count
                         }).ToList() ?? new List<SubOptionViewModel>()
@@ -765,16 +763,7 @@ namespace ECommerce.Controllers
             var theCartproducts = _cartProducts.List().Where(a => a.cartId == TheCart.Id).ToList();
             _model.SelectedOptions = _cartProductsOptions.List().Where(a => a.ProductID == productID && a.cartID == cart.Id).Select(po => new ProductOptionViewModel { OptionId = po.MainOptionID, SubOptionId = po.SubOptionID }).ToList();
 
-            //foreach (var mainOption in _model.ExistingOptions)
-            //{
-            //    mainOption.SubOptions.Insert(0, new SubOptionViewModel
-            //    {
-            //        SubOptionId = -1,
-            //        SubOptionName = "اختار " + mainOption.MainOptionName,
-            //        MainOptionId = mainOption.MainOptionId,
-            //        SubOptionCount = -1
-            //    });
-            //}
+
             return _model;
         }
 
@@ -788,11 +777,11 @@ namespace ECommerce.Controllers
                     .Where(po => po.prdouctId == productID)
                     .Select(po => new MainOptionViewModel
                     {
-                        MainOptionId = po.Id, // توفير معرف الخيار الرئيسي
+                        MainOptionId = po.Id, 
                         MainOptionName = po.name,
                         SubOptions = po.Options?.Select(o => new SubOptionViewModel
                         {
-                            SubOptionId = o.Id, // توفير معرف الخيار الفرعي
+                            SubOptionId = o.Id, 
                             SubOptionName = o.Name,
                             SubOptionCount = o.count
                         }).ToList() ?? new List<SubOptionViewModel>()
@@ -800,20 +789,7 @@ namespace ECommerce.Controllers
 
             };
 
-            //var TheCart = _cart.findByIdUser(_userManager.GetUserId(User));
-            //var theCartproducts = _cartProducts.List().Where(a => a.cartId == TheCart.Id).ToList();
-            //_model.SelectedOptions = _cartProductsOptions.List().Where(a => a.ProductID == productID && a.cartID == cart.Id).Select(po => new ProductOptionViewModel { OptionId = po.MainOptionID, SubOptionId = po.SubOptionID }).ToList();
 
-            //foreach (var mainOption in _model.ExistingOptions)
-            //{
-            //    mainOption.SubOptions.Insert(0, new SubOptionViewModel
-            //    {
-            //        SubOptionId = -1,
-            //        SubOptionName = "اختار " + mainOption.MainOptionName,
-            //        MainOptionId = mainOption.MainOptionId,
-            //        SubOptionCount = -1
-            //    });
-            //}
             return _model.ExistingOptions;
         }
     }
