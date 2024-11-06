@@ -4,7 +4,7 @@ Project preparation steps:
 2- Connect to the database: go to (appsettings.json) file, And set the Connection string in (DefaultConnection).
 3- Go to (Package Manager Console) and write: Update-database;
 
-\ Now the project should work.
+\\ Now the project should work.
 
 To access the Admin account:
 1- Register using the email Admin@gmail.com
